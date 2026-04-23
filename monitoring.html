@@ -1,0 +1,2451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VISTAGEOMATICS – Monitoring Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --vista-blue: #165f7d;
+      --vista-blue-light: #2a7fa3;
+      --vista-blue-dark: #0b3045;
+      --bg-card: #ffffff;
+      --accent-soft: #e2f0f6;
+      --border-soft: #d6e2f0;
+      --text-main: #101827;
+      --text-muted: #6b7280;
+      --alert-red: #c0392b;
+      --alert-yellow: #e67e22;
+      --alert-green: #27ae60;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Inter", sans-serif;
+      margin: 0; padding: 24px;
+      background: radial-gradient(circle at top, #f4f8fc 0, #e4edf6 40%, #dde6f3 100%);
+      color: var(--text-main);
+    }
+    .page-wrap { max-width: 1200px; margin: 0 auto; }
+    .container {
+      background: var(--bg-card);
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(5,41,66,0.18), 0 0 0 1px rgba(5,41,66,0.04);
+      overflow: hidden; position: relative;
+    }
+    .container::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(circle at top right, rgba(22,95,125,0.18), transparent 55%);
+    }
+    .header-bar {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 28px;
+      background: linear-gradient(120deg, var(--vista-blue-light) 0%, var(--vista-blue) 40%, var(--vista-blue-dark) 100%);
+      color: #fff;
+    }
+    .header-left h1 {
+      margin: 0; font-family: "Montserrat", sans-serif;
+      font-size: 1.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    .vista-bold { font-weight: 700; }
+    .geomatics-regular { font-weight: 400; }
+    .header-left p { margin: 0; font-size: 0.95rem; opacity: 0.92; }
+    .header-logo { height: 80px; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.35)); }
+
+    .form-page {
+      position: relative; z-index: 1; padding: 20px 24px 28px;
+      page-break-after: always; page-break-inside: avoid;
+    }
+    .form-page:last-of-type { page-break-after: auto; }
+    .page-title {
+      font-family: "Montserrat", sans-serif; font-size: 1.3rem; font-weight: 700;
+      text-align: center; margin: 6px 0 14px; color: var(--vista-blue-dark);
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .section {
+      margin: 12px 0; padding: 14px 16px 16px;
+      border-radius: 14px; border: 1px solid var(--border-soft);
+      background: linear-gradient(135deg, #fbfdff 0%, #f4f8fd 60%, #eff5fb 100%);
+      box-shadow: 0 8px 20px rgba(5,41,66,0.05); position: relative;
+    }
+    .section::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--vista-blue-light), var(--vista-blue-dark));
+      border-radius: 14px 14px 0 0;
+    }
+    .section-title { font-weight: 600; font-size: 1rem; color: var(--vista-blue-dark); margin-bottom: 4px; }
+    .section-subtext { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+    label { font-size: 0.82rem; font-weight: 600; display: block; margin-bottom: 3px; }
+    input[type="text"], input[type="date"], input[type="number"], textarea, select {
+      width: 100%; padding: 6px 8px; font-size: 0.86rem;
+      border: 1px solid var(--border-soft); border-radius: 8px;
+      background: #f9fbff; transition: 0.15s; font-family: "Inter", sans-serif;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none; border-color: var(--vista-blue-light);
+      background: #fff; box-shadow: 0 0 0 2px rgba(38,132,168,0.22);
+    }
+    textarea { min-height: 70px; resize: vertical; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 10px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 10px; }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th, td { border: 1px solid #c6d4e5; padding: 5px 6px; text-align: center; white-space: nowrap; }
+    td:first-child { text-align: left; }
+    th { background: #e7f0fb; font-weight: 600; color: var(--vista-blue-dark); }
+    th.group-header {
+      background: linear-gradient(90deg, var(--vista-blue-light), var(--vista-blue-dark));
+      color: #fff; font-size: 0.78rem; letter-spacing: 0.04em;
+    }
+    .table-note { font-size: 0.76rem; color: var(--text-muted); margin-top: 3px; }
+    .mon-table input[type="text"], .mon-table input[type="number"] {
+      width: 100px; padding: 3px 5px; font-size: 0.78rem;
+      border-radius: 5px; text-align: center; background: #f9fbff;
+    }
+    .mon-table td.coord-cell input { width: 120px; }
+    .mon-table td.diff-cell input  { width: 68px; }
+    .diff-cell input { border-left: 2px solid var(--vista-blue-light); }
+    /* Alert colours */
+    .val-ok    { background: rgba(39,174,96,0.10) !important; }
+    .val-warn  { background: rgba(230,126,34,0.15) !important; color: var(--alert-yellow) !important; font-weight: 600; }
+    .val-alert { background: rgba(192,57,43,0.15) !important; color: var(--alert-red)    !important; font-weight: 700; }
+    /* Type badges */
+    .pt-type { display: inline-block; font-size: 0.68rem; font-weight: 600;
+      padding: 1px 6px; border-radius: 999px; letter-spacing: 0.04em; text-transform: uppercase; }
+    .pt-type-shoring  { background:#dbeafe; color:#1e40af; }
+    .pt-type-building { background:#fef3c7; color:#92400e; }
+    .pt-type-target   { background:#d1fae5; color:#065f46; }
+    .pt-type-occ      { background:#f3e8ff; color:#6b21a8; }
+
+    /* Description autocomplete */
+    .desc-wrap { position: relative; }
+    .desc-input {
+      width: 100%; padding: 3px 5px; font-size: 0.78rem;
+      border-radius: 5px; font-family: "Inter", sans-serif;
+    }
+    .desc-suggestions {
+      display: none; position: absolute; top: 100%; left: 0; right: 0;
+      background: #fff; border: 1px solid var(--border-soft);
+      border-radius: 8px; box-shadow: 0 8px 24px rgba(5,41,66,0.15);
+      z-index: 999; max-height: 180px; overflow-y: auto; margin-top: 2px;
+    }
+    .desc-suggestions.open { display: block; }
+    .desc-suggestion-item {
+      padding: 6px 10px; cursor: pointer; font-size: 0.8rem;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid #f0f4f8;
+      transition: background 0.1s;
+    }
+    .desc-suggestion-item:last-child { border-bottom: none; }
+    .desc-suggestion-item:hover, .desc-suggestion-item.active {
+      background: var(--accent-soft);
+    }
+    .desc-suggestion-item .sug-badge { flex-shrink: 0; }
+    .desc-suggestion-item .sug-text  { color: var(--text-main); font-weight: 500; }
+
+    /* Buttons */
+    .btn-row { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; margin-top:14px; }
+    .btn-row-controls { justify-content:flex-start; }
+    button {
+      padding: 7px 16px; font-size: 0.82rem; border-radius: 999px; border: none;
+      cursor: pointer; font-weight: 600; letter-spacing: 0.05em;
+      display: inline-flex; align-items: center; gap: 6px;
+      white-space: nowrap; font-family: "Inter", sans-serif;
+    }
+    .btn-primary { background: linear-gradient(120deg,var(--vista-blue-light),var(--vista-blue),var(--vista-blue-dark)); color:#fff; box-shadow:0 8px 18px rgba(5,41,66,0.3); }
+    .btn-secondary { background:#f3f4f6; color:var(--text-main); border:1px solid #d4d7dd; }
+    .btn-ghost { background:transparent; color:var(--vista-blue-dark); border:1px dashed var(--vista-blue-light); }
+    .btn-danger { background:#fff0ef; color:var(--alert-red); border:1px solid #f5c6c2; }
+    .btn-import {
+      background: linear-gradient(120deg,#059669,#065f46);
+      color:#fff; box-shadow:0 6px 14px rgba(6,95,70,0.28);
+    }
+    /* CSV import drop zone */
+    .csv-drop-zone {
+      border: 2px dashed var(--vista-blue-light); border-radius: 12px;
+      padding: 18px 20px; text-align: center; cursor: pointer;
+      transition: 0.2s; background: #f4fbff; position: relative;
+    }
+    .csv-drop-zone:hover, .csv-drop-zone.drag-over {
+      background: #e2f4fc; border-color: var(--vista-blue-dark);
+    }
+    .csv-drop-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+      width: 100%; height: 100%; padding: 0; border: none; background: none;
+    }
+    .csv-drop-zone .drop-icon { font-size: 1.8rem; margin-bottom: 4px; }
+    .csv-drop-zone .drop-label { font-size: 0.84rem; font-weight: 600; color: var(--vista-blue-dark); }
+    .csv-drop-zone .drop-sub   { font-size: 0.76rem; color: var(--text-muted); margin-top: 2px; }
+    /* Import status banner */
+    .import-banner {
+      display: none; padding: 8px 14px; border-radius: 8px;
+      font-size: 0.82rem; font-weight: 600; margin-top: 10px;
+    }
+    .import-banner.ok  { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+    .import-banner.err { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    /* Legend */
+    .legend { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+    .legend-item { display:flex; align-items:center; gap:5px; font-size:0.76rem; color:var(--text-muted); }
+    .legend-dot { width:10px; height:10px; border-radius:50%; }
+    .mt-10 { margin-top:8px; }
+    .mt-14 { margin-top:10px; }
+    /* Sticky bottom toolbar */
+    .sticky-toolbar {
+      position: sticky;
+      bottom: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-soft);
+      box-shadow: 0 -4px 24px rgba(5,41,66,0.12);
+      padding: 10px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      justify-content: space-between;
+    }
+    .sticky-toolbar .toolbar-left  { display:flex; gap:8px; flex-wrap:wrap; }
+    .sticky-toolbar .toolbar-right { display:flex; gap:8px; flex-wrap:wrap; }
+    @media (max-width:640px) {
+      .sticky-toolbar { padding:8px 12px; }
+      .sticky-toolbar .toolbar-left,
+      .sticky-toolbar .toolbar-right { width:100%; justify-content:center; }
+    }
+    @media print {
+      .sticky-toolbar { display:none !important; }
+    }
+    .save-badge {
+      position:fixed; right:16px; bottom:16px; z-index:9999;
+      background:rgba(255,255,255,0.92); border:1px solid rgba(22,95,125,0.18);
+      box-shadow:0 10px 24px rgba(5,41,66,0.14); border-radius:999px;
+      padding:8px 12px; font-size:0.78rem; color:var(--vista-blue-dark);
+      display:none; align-items:center; gap:8px; backdrop-filter:blur(8px);
+    }
+    .save-dot { width:8px; height:8px; border-radius:50%; background:var(--vista-blue-light); box-shadow:0 0 0 3px rgba(42,127,163,0.18); }
+    @media (max-width:640px) {
+      body { padding:10px; }
+      .header-bar { flex-direction:column; gap:10px; text-align:center; }
+      .header-left h1 { font-size:1.2rem; }
+    }
+    @media print {
+      body { background:#fff; padding:0; }
+      .page-wrap { max-width:100%; margin:0; }
+      .container { border-radius:0; box-shadow:none; }
+      .container::before { display:none; }
+      .btn-row, .btn-row-controls, .save-badge, .csv-import-section { display:none !important; }
+      input, textarea, select { box-shadow:none !important; }
+      .form-page { page-break-after:always; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header-bar">
+    <div class="header-left">
+      <h1><span class="vista-bold">VISTA</span><span class="geomatics-regular">GEOMATICS</span></h1>
+      <p>Monitoring Report</p>
+    </div>
+    <img src="vista-geomatics.png" class="header-logo" alt="Vista Geomatics Logo" onerror="this.style.display='none'">
+  </div>
+
+  <form id="monitoringForm" autocomplete="off">
+
+    <!-- ===== PAGE 1 – PROJECT DETAILS ===== -->
+    <div class="form-page" id="titlePage">
+      <div class="page-title">Project Details</div>
+
+      <div class="section">
+        <div class="section-title">Project Information</div>
+        <div class="grid-2">
+          <div><label>Job No.</label><input type="text" name="job_no"></div>
+          <div><label>Client</label><input type="text" name="client"></div>
+          <div><label>Project Name</label><input type="text" name="project_name"></div>
+          <div><label>Location / Site Address</label><input type="text" name="location"></div>
+          <div><label>Land Surveyor</label><input type="text" name="land_surveyor"></div>
+          <div><label>Monitoring Start Date</label><input type="date" name="start_date"></div>
+          <div><label>Report Date</label><input type="date" name="report_date"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Control / Reference Information</div>
+        <div class="grid-2">
+          <div><label>Survey Method</label><input type="text" name="survey_method" value="Total Station" readonly style="background:#f0f4f8;color:var(--text-muted);cursor:default"></div>
+          <div><label>Initial Dataset Date</label><input type="date" name="initial_dataset_date"></div>
+          <div><label>Control Station(s)</label><input type="text" name="control_stations"></div>
+        </div>
+        <div class="mt-10"><label>Notes on Reference Setup</label><textarea name="control_notes"></textarea></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Survey Equipment</div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>TYPE</th><th>MODEL</th><th>SERIAL NO.</th><th>CALIBRATION DATE</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" name="equip_type_1"></td>
+                <td><input type="text" name="equip_model_1"></td>
+                <td><input type="text" name="equip_serial_1"></td>
+                <td><input type="text" name="equip_cal_1"></td>
+              </tr>
+              <tr>
+                <td><input type="text" name="equip_type_2"></td>
+                <td><input type="text" name="equip_model_2"></td>
+                <td><input type="text" name="equip_serial_2"></td>
+                <td><input type="text" name="equip_cal_2"></td>
+              </tr>
+              <tr>
+                <td><input type="text" name="equip_type_3"></td>
+                <td><input type="text" name="equip_model_3"></td>
+                <td><input type="text" name="equip_serial_3"></td>
+                <td><input type="text" name="equip_cal_3"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Alert Thresholds</div>
+        <div class="section-subtext">Cells in dataset tables exceeding these absolute movement values (mm) will be highlighted automatically.</div>
+        <div class="grid-3">
+          <div><label>Warning Threshold (mm)</label><input type="number" name="thresh_warn" id="thresh_warn" value="20" min="0"></div>
+          <div><label>Alert Threshold (mm)</label><input type="number" name="thresh_alert" id="thresh_alert" value="30" min="0"></div>
+          <div><label>Absolute Limit (mm)</label><input type="number" name="thresh_limit" id="thresh_limit" value="50" min="0"></div>
+        </div>
+        <div class="legend mt-10">
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(39,174,96,0.5)"></div>Within tolerance</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(230,126,34,0.7)"></div>Warning threshold exceeded</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(192,57,43,0.7)"></div>Alert threshold exceeded</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== PAGE 2 – INITIAL DATASET (CSV import) ===== -->
+    <div class="form-page" id="initialDatasetPage">
+      <div class="page-title">Initial Dataset (Baseline)</div>
+
+      <div class="section csv-import-section" id="initialImportSection">
+        <div class="section-title">Import Baseline CSV</div>
+        <div class="section-subtext">Import your initial survey CSV. This becomes the reference for all subsequent dN / dE / dH calculations. OCC rows are automatically skipped.</div>
+        <div class="csv-drop-zone" id="initialDropZone">
+          <input type="file" accept=".csv,.txt" id="initialCsvInput">
+          <div class="drop-icon">📂</div>
+          <div class="drop-label">Drop CSV / TXT file here, or tap to browse</div>
+          <div class="drop-sub">Format: PointID, Northing, Easting, Elevation, Description</div>
+        </div>
+        <div class="import-banner" id="initialImportBanner"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Baseline Survey Information</div>
+        <div class="grid-3">
+          <div><label>Survey Date</label><input type="date" name="initial_date"></div>
+          <div><label>Surveyor</label><input type="text" name="initial_surveyor"></div>
+          <div><label>Weather / Conditions</label><input type="text" name="initial_conditions"></div>
+        </div>
+        <div class="mt-10"><label>Notes</label><textarea name="initial_notes"></textarea></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Baseline Point Coordinates</div>
+        <div class="table-scroll">
+          <table id="initialTable">
+            <thead>
+              <tr>
+                <th style="min-width:65px">PT #</th>
+                <th style="min-width:130px">DESCRIPTION</th>
+                <th>NORTHING</th>
+                <th>EASTING</th>
+                <th>ELEVATION</th>
+                <th style="min-width:110px">NOTES</th>
+              </tr>
+            </thead>
+            <tbody id="initialTableBody"></tbody>
+          </table>
+        </div>
+        <div class="btn-row btn-row-controls mt-10">
+          <button type="button" class="btn-ghost" id="addInitialRow">+ Add Row</button>
+          <button type="button" class="btn-secondary" id="removeInitialRow">− Remove Last Row</button>
+        </div>
+        <div class="table-note">Rows are populated automatically when you import a CSV above. OCC / instrument setup points are excluded.</div>
+      </div>
+    </div>
+
+    <!-- ===== DATASET PAGES CONTAINER ===== -->
+    <div id="datasetPagesContainer"></div>
+
+  </form>
+</div>
+</div>
+
+<!-- STICKY BOTTOM TOOLBAR -->
+<div class="sticky-toolbar" id="stickyToolbar">
+  <div class="toolbar-left">
+    <button type="button" id="addDatasetPage" class="btn-primary">+ Add Dataset</button>
+    <button type="button" id="resetForm" class="btn-secondary">Reset Form</button>
+  </div>
+  <div class="toolbar-right">
+    <button type="button" id="downloadPdf" class="btn-ghost">⬇ Download PDF</button>
+    <button type="button" id="shareBtn" class="btn-ghost">↗ Share PDF</button>
+  </div>
+</div>
+
+<div class="save-badge" id="saveBadge"><span class="save-dot"></span><span id="saveBadgeText">Saved</span></div>
+
+<!-- PDF progress overlay -->
+<style>
+  #pdfProgress { display:none; position:fixed; inset:0; z-index:99999; background:rgba(11,48,69,0.72); backdrop-filter:blur(6px); align-items:center; justify-content:center; }
+  #pdfProgress.active { display:flex; }
+  .progress-box { background:#fff; border-radius:18px; padding:28px 36px; min-width:300px; max-width:90vw; box-shadow:0 24px 60px rgba(5,41,66,0.35); text-align:center; }
+  .progress-title { font-family:"Montserrat",sans-serif; font-size:1rem; font-weight:700; color:var(--vista-blue-dark); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em; }
+  .progress-sub { font-size:0.82rem; color:var(--text-muted); margin-bottom:16px; min-height:1.2em; }
+  .progress-track { width:100%; height:10px; background:#e4edf6; border-radius:999px; overflow:hidden; margin-bottom:10px; }
+  .progress-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--vista-blue-light),var(--vista-blue-dark)); border-radius:999px; transition:width 0.25s ease; }
+  .progress-count { font-size:0.78rem; color:var(--text-muted); }
+</style>
+<div id="pdfProgress">
+  <div class="progress-box">
+    <div class="progress-title" id="progressTitle">Generating PDF</div>
+    <div class="progress-sub" id="progressSub">Starting…</div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-count" id="progressCount"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     CSV PARSER
+  ============================================================ */
+  function parseCsv(text) {
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const points = [];
+    for (const line of lines) {
+      const cols = line.split(',').map(c => c.trim());
+      const [ptRaw, nRaw, eRaw, hRaw, descRaw] = cols;
+      if (!ptRaw) continue;
+      if (/^OCC/i.test(ptRaw)) continue;
+      const n = parseFloat(nRaw), e = parseFloat(eRaw), h = parseFloat(hRaw);
+      if (isNaN(n) || isNaN(e) || isNaN(h)) continue;
+      points.push({ pt: ptRaw, N: n, E: e, H: h, desc: (descRaw || '').trim() });
+    }
+    return points;
+  }
+
+  /* ============================================================
+     UNITS CHECK
+     Heuristic: if elevation values are suspiciously large (> 5000m)
+     OR if the spread of elevations suggests feet (multiplied by ~3.28
+     from a typical site), warn the user before accepting the import.
+     Also checks if all elevations are identical (flat-file export bug).
+  ============================================================ */
+  function checkUnits(points) {
+    const warnings = [];
+    if (!points.length) return warnings;
+
+    const elevs = points.map(p => p.H);
+    const minH = Math.min(...elevs), maxH = Math.max(...elevs);
+    const spreadH = maxH - minH;
+
+    // Northings/Eastings that look like feet (Alberta site grid typically 5,600,000-5,700,000 m)
+    const northings = points.map(p => p.N);
+    const minN = Math.min(...northings);
+
+    // If northings are suspiciously small they may be local feet-based
+    if (minN < 1000 && minN > 0) {
+      warnings.push('! Northing values appear very small - coordinates may be in a local feet-based system rather than metres.');
+    }
+
+    // Elevations > 3000 m could be feet (e.g. 3400 ft ≈ 1036 m)
+    if (maxH > 3000) {
+      warnings.push(`! Elevation values appear large (max ${maxH.toFixed(2)}) - values may be in feet rather than metres. Expected range for this region is roughly 800-2000 m.`);
+    }
+
+    // All elevations identical - possible export error
+    if (points.length > 2 && spreadH === 0) {
+      warnings.push('! All elevation values are identical - this may indicate a flat CSV export or missing Z data.');
+    }
+
+    // Elevation spread > 500 m on a shoring site is unusual
+    if (spreadH > 500) {
+      warnings.push(`! Elevation spread across points is ${spreadH.toFixed(2)} m - unusually large for a shoring site. Check that units are correct.`);
+    }
+
+    return warnings;
+  }
+
+  /* ============================================================
+     REPEAT IMPORT DETECTION
+     Collects all survey dates currently used across dataset pages.
+  ============================================================ */
+  function getUsedDatasetDates() {
+    const dates = new Set();
+    document.querySelectorAll('.dataset-page').forEach(page => {
+      const uid = page.getAttribute('data-uid');
+      const dateEl = page.querySelector(`[name="${uid}_date"]`);
+      if (dateEl && dateEl.value) dates.add(dateEl.value);
+    });
+    return dates;
+  }
+
+  /* ============================================================
+     BASELINE STORE  -  keyed by point ID (string)
+  ============================================================ */
+  let baseline = {};   // { "55000": { N, E, H, desc }, … }
+
+  function setBaseline(points) {
+    baseline = {};
+    points.forEach(p => { baseline[p.pt] = { N: p.N, E: p.E, H: p.H, desc: p.desc }; });
+  }
+
+  function calcDiff(ptId, N, E, H) {
+    const b = baseline[ptId];
+    if (!b) return { dN: null, dE: null, dH: null };
+    // Differences in mm (x1000)
+    const dN = Math.round((N - b.N) * 1000);
+    const dE = Math.round((E - b.E) * 1000);
+    const dH = Math.round((H - b.H) * 1000);
+    return { dN, dE, dH };
+  }
+
+  /* ============================================================
+     TYPE BADGE
+  ============================================================ */
+  function typeBadge(desc) {
+    if (!desc) return '';
+    const d = desc.toUpperCase();
+    if (d.includes('BUILDING')) return `<span class="pt-type pt-type-building">${desc}</span>`;
+    if (d.includes('TARGET'))   return `<span class="pt-type pt-type-target">${desc}</span>`;
+    if (d.includes('SHORING'))  return `<span class="pt-type pt-type-shoring">${desc}</span>`;
+    return `<span class="pt-type pt-type-occ">${desc}</span>`;
+  }
+
+  /* ============================================================
+     DESCRIPTION AUTOCOMPLETE ENGINE
+     - Learns every unique description typed anywhere in the form
+     - Seeds with common shoring terms
+     - Shows filtered suggestions as user types; Tab/Enter to confirm
+     - Click any suggestion to re-use instantly
+  ============================================================ */
+  const SEED_DESCS = ['TARGET(BUILDING)','TARGET','PLFMK(SHORING)'];
+  const descHistory = new Set(SEED_DESCS);
+
+  function learnDesc(val) {
+    const v = val.trim();
+    if (v) descHistory.add(v);
+  }
+
+  function getSuggestions(query) {
+    const q = query.trim().toUpperCase();
+    if (!q) return Array.from(descHistory);
+    return Array.from(descHistory).filter(d => d.toUpperCase().includes(q));
+  }
+
+  function wireDescAutocomplete(input, sugBox) {
+    let activeIdx = -1;
+
+    function renderSuggestions(list) {
+      sugBox.innerHTML = '';
+      activeIdx = -1;
+      if (!list.length) { sugBox.classList.remove('open'); return; }
+      list.forEach((text, i) => {
+        const item = document.createElement('div');
+        item.className = 'desc-suggestion-item';
+        item.innerHTML = `<span class="sug-badge">${typeBadge(text)}</span><span class="sug-text">${text}</span>`;
+        item.addEventListener('mousedown', e => {
+          e.preventDefault();
+          input.value = text;
+          learnDesc(text);
+          sugBox.classList.remove('open');
+          input.dispatchEvent(new Event('input', {bubbles:true}));
+        });
+        sugBox.appendChild(item);
+      });
+      sugBox.classList.add('open');
+    }
+
+    input.addEventListener('focus', () => {
+      input.select(); // highlight existing text so it's easy to overwrite
+      renderSuggestions(getSuggestions(''));
+    });
+
+    input.addEventListener('input', () => {
+      renderSuggestions(getSuggestions(input.value));
+    });
+
+    input.addEventListener('keydown', e => {
+      const items = sugBox.querySelectorAll('.desc-suggestion-item');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeIdx = Math.min(activeIdx + 1, items.length - 1);
+        items.forEach((el,i) => el.classList.toggle('active', i === activeIdx));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeIdx = Math.max(activeIdx - 1, -1);
+        items.forEach((el,i) => el.classList.toggle('active', i === activeIdx));
+      } else if ((e.key === 'Tab' || e.key === 'Enter') && activeIdx >= 0 && items[activeIdx]) {
+        e.preventDefault();
+        input.value = items[activeIdx].querySelector('.sug-text').textContent;
+        learnDesc(input.value);
+        sugBox.classList.remove('open');
+        input.dispatchEvent(new Event('input', {bubbles:true}));
+      } else if (e.key === 'Escape') {
+        sugBox.classList.remove('open');
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      setTimeout(() => {
+        sugBox.classList.remove('open');
+        if (input.value.trim()) learnDesc(input.value.trim());
+      }, 150);
+    });
+  }
+
+  /* ============================================================
+     INITIAL TABLE
+  ============================================================ */
+  function buildInitialRow(pt, desc, N, E, H, notes) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="text-align:center;font-weight:600">${pt}</td>
+      <td style="text-align:left">${typeBadge(desc)}</td>
+      <td style="text-align:center">${N !== undefined ? N.toFixed(4) : ''}</td>
+      <td style="text-align:center">${E !== undefined ? E.toFixed(4) : ''}</td>
+      <td style="text-align:center">${H !== undefined ? H.toFixed(4) : ''}</td>
+      <td><input type="text" name="init_notes_${pt}" value="${notes||''}"></td>
+    `;
+    return tr;
+  }
+
+  function buildInitialRowEditable(pt, desc, N, E, H, notes) {
+    const tr = document.createElement('tr');
+    const uid = Math.random().toString(36).slice(2);
+    tr.innerHTML = `
+      <td><input type="text" name="init_pt_${uid}" value="${pt||''}" style="width:60px;text-align:center" class="init-pt-input"></td>
+      <td>
+        <div class="desc-wrap">
+          <input type="text" name="init_desc_${uid}" value="${desc||''}"
+            class="init-desc-input desc-input" placeholder="e.g. TARGET"
+            autocomplete="off" spellcheck="false">
+          <div class="desc-suggestions" id="sug_${uid}"></div>
+        </div>
+      </td>
+      <td><input type="text" name="init_N_${uid}" value="${N!==undefined&&N!==''?N:''}" style="width:120px;text-align:center" class="init-N-input"></td>
+      <td><input type="text" name="init_E_${uid}" value="${E!==undefined&&E!==''?E:''}" style="width:120px;text-align:center" class="init-E-input"></td>
+      <td><input type="text" name="init_H_${uid}" value="${H!==undefined&&H!==''?H:''}" style="width:100px;text-align:center" class="init-H-input"></td>
+      <td><input type="text" name="init_notes_${uid}" value="${notes||''}" style="min-width:100px"></td>
+    `;
+    wireDescAutocomplete(tr.querySelector('.desc-input'), tr.querySelector(`#sug_${uid}`));
+    return tr;
+  }
+
+  function populateInitialTable(points) {
+    const tbody = document.getElementById('initialTableBody');
+    tbody.innerHTML = '';
+    points.forEach(p => tbody.appendChild(buildInitialRowEditable(p.pt, p.desc, p.N, p.E, p.H, '')));
+  }
+
+  function collectInitialTableData() {
+    const rows = document.querySelectorAll('#initialTableBody tr');
+    const pts = [];
+    rows.forEach(r => {
+      const ptIn   = r.querySelector('.init-pt-input');
+      const descIn = r.querySelector('.init-desc-input');
+      const NIn    = r.querySelector('.init-N-input');
+      const EIn    = r.querySelector('.init-E-input');
+      const HIn    = r.querySelector('.init-H-input');
+      if (!ptIn) return;
+      const pt = ptIn.value.trim();
+      if (!pt) return;
+      const N = parseFloat(NIn.value), E = parseFloat(EIn.value), H = parseFloat(HIn.value);
+      if (isNaN(N)||isNaN(E)||isNaN(H)) return;
+      pts.push({ pt, desc: descIn ? descIn.value : '', N, E, H });
+    });
+    return pts;
+  }
+
+  function rebuildBaselineFromTable() {
+    const pts = collectInitialTableData();
+    setBaseline(pts);
+    // Refresh all diff cells across all dataset pages
+    document.querySelectorAll('.ds-obs-row').forEach(row => {
+      const ptId = row.getAttribute('data-pt');
+      if (!ptId) return;
+      const nIn = row.querySelector('.obs-N');
+      const eIn = row.querySelector('.obs-E');
+      const hIn = row.querySelector('.obs-H');
+      if (!nIn||!eIn||!hIn) return;
+      const N = parseFloat(nIn.value), E = parseFloat(eIn.value), H = parseFloat(hIn.value);
+      if (!isNaN(N)&&!isNaN(E)&&!isNaN(H)) {
+        const d = calcDiff(ptId, N, E, H);
+        setDiffCells(row, d);
+      }
+    });
+  }
+
+  document.getElementById('addInitialRow').addEventListener('click', () => {
+    document.getElementById('initialTableBody').appendChild(buildInitialRowEditable('','TARGET'));
+    saveNow();
+  });
+  document.getElementById('removeInitialRow').addEventListener('click', () => {
+    const tbody = document.getElementById('initialTableBody');
+    if (tbody.lastElementChild) tbody.removeChild(tbody.lastElementChild);
+    rebuildBaselineFromTable();
+    saveNow();
+  });
+
+  /* ============================================================
+     CSV IMPORT - INITIAL
+  ============================================================ */
+  function handleInitialCsv(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const pts = parseCsv(e.target.result);
+      const banner = document.getElementById('initialImportBanner');
+      if (!pts.length) {
+        banner.className = 'import-banner err';
+        banner.textContent = '! No valid points found. Check the file format: PointID, Northing, Easting, Elevation, Description';
+        banner.style.display = 'block';
+        return;
+      }
+      // Units check
+      const unitWarnings = checkUnits(pts);
+      if (unitWarnings.length) {
+        const proceed = confirm(
+          'Unit warnings detected on baseline import:\n\n' +
+          unitWarnings.join('\n\n') +
+          '\n\nDo you want to import anyway?'
+        );
+        if (!proceed) return;
+      }
+      populateInitialTable(pts);
+      setBaseline(pts);
+      let msg = `OK: ${pts.length} points imported as baseline.`;
+      if (unitWarnings.length) msg += ' (imported with warnings - please verify units)';
+      banner.className = unitWarnings.length ? 'import-banner err' : 'import-banner ok';
+      banner.textContent = msg;
+      banner.style.display = 'block';
+      recalcAllDatasets();
+      saveNow();
+    };
+    reader.readAsText(file);
+  }
+
+  const initialInput = document.getElementById('initialCsvInput');
+  initialInput.addEventListener('change', e => { if (e.target.files[0]) handleInitialCsv(e.target.files[0]); });
+  const initialDrop = document.getElementById('initialDropZone');
+  initialDrop.addEventListener('dragover', e => { e.preventDefault(); initialDrop.classList.add('drag-over'); });
+  initialDrop.addEventListener('dragleave', () => initialDrop.classList.remove('drag-over'));
+  initialDrop.addEventListener('drop', e => {
+    e.preventDefault(); initialDrop.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0]; if (f) handleInitialCsv(f);
+  });
+
+  /* ============================================================
+     DATASET PAGE BUILDER
+  ============================================================ */
+  let datasetCount = 0;
+
+  function setDiffCells(row, d) {
+    const dNIn = row.querySelector('.obs-dN');
+    const dEIn = row.querySelector('.obs-dE');
+    const dHIn = row.querySelector('.obs-dH');
+    if (dNIn && d.dN !== null) { dNIn.value = d.dN; highlightCell(dNIn); }
+    if (dEIn && d.dE !== null) { dEIn.value = d.dE; highlightCell(dEIn); }
+    if (dHIn && d.dH !== null) { dHIn.value = d.dH; highlightCell(dHIn); }
+  }
+
+  function buildObsRow(pt, desc, N, E, H, dN, dE, dH, remarks, isManual) {
+    const tr = document.createElement('tr');
+    tr.className = 'ds-obs-row';
+    tr.setAttribute('data-pt', pt || '');
+    const uid = Math.random().toString(36).slice(2);
+
+    // For CSV-imported rows: show static badge + hidden pt input
+    // For manually-added rows (isManual=true): show editable pt + desc fields
+    const ptCell = isManual
+      ? `<input type="text" class="obs-pt-new" value="${pt||''}" style="width:55px;text-align:center" placeholder="Pt#">`
+      : `<strong>${pt}</strong>`;
+
+    const descCell = isManual
+      ? `<div class="desc-wrap">
+           <input type="text" class="obs-desc-input desc-input" value="${desc||''}" placeholder="Description"
+             autocomplete="off" spellcheck="false" style="width:100%">
+           <div class="desc-suggestions" id="obssug_${uid}"></div>
+         </div>`
+      : typeBadge(desc);
+
+    tr.innerHTML = `
+      <td style="text-align:center;font-weight:600;min-width:60px">${ptCell}</td>
+      <td style="text-align:left;min-width:130px">${descCell}</td>
+      <td class="coord-cell"><input type="text" class="obs-N" value="${N!==undefined&&N!==''?N:''}" style="width:120px;text-align:center"></td>
+      <td class="coord-cell"><input type="text" class="obs-E" value="${E!==undefined&&E!==''?E:''}" style="width:120px;text-align:center"></td>
+      <td class="coord-cell"><input type="text" class="obs-H" value="${H!==undefined&&H!==''?H:''}" style="width:100px;text-align:center"></td>
+      <td class="diff-cell"><input type="text" class="obs-dN diff-input" value="${dN!==undefined&&dN!==''?dN:''}" style="width:68px;text-align:center"></td>
+      <td class="diff-cell"><input type="text" class="obs-dE diff-input" value="${dE!==undefined&&dE!==''?dE:''}" style="width:68px;text-align:center"></td>
+      <td class="diff-cell"><input type="text" class="obs-dH diff-input" value="${dH!==undefined&&dH!==''?dH:''}" style="width:68px;text-align:center"></td>
+      <td><input type="text" class="obs-remarks" value="${remarks||''}" style="min-width:110px"></td>
+    `;
+
+    // Wire autocomplete for manual desc field
+    if (isManual) {
+      const descIn = tr.querySelector('.obs-desc-input');
+      const sugBox = tr.querySelector(`#obssug_${uid}`);
+      wireDescAutocomplete(descIn, sugBox);
+      // Keep data-pt in sync with manual pt input
+      const ptIn = tr.querySelector('.obs-pt-new');
+      if (ptIn) ptIn.addEventListener('input', () => tr.setAttribute('data-pt', ptIn.value.trim()));
+    }
+
+    // Auto-calc diffs when coords change
+    const nIn = tr.querySelector('.obs-N');
+    const eIn = tr.querySelector('.obs-E');
+    const hIn = tr.querySelector('.obs-H');
+    function recalcRow() {
+      const ptId = tr.getAttribute('data-pt');
+      const Nv = parseFloat(nIn.value), Ev = parseFloat(eIn.value), Hv = parseFloat(hIn.value);
+      if (ptId && !isNaN(Nv) && !isNaN(Ev) && !isNaN(Hv)) {
+        const d = calcDiff(ptId, Nv, Ev, Hv);
+        setDiffCells(tr, d);
+      }
+      saveNow();
+    }
+    nIn.addEventListener('input', recalcRow);
+    eIn.addEventListener('input', recalcRow);
+    hIn.addEventListener('input', recalcRow);
+    tr.querySelectorAll('.diff-input').forEach(inp => inp.addEventListener('input', () => { highlightCell(inp); saveNow(); }));
+    return tr;
+  }
+
+  function buildDatasetPage(dsIndex) {
+    const uid = `ds${dsIndex}`;
+    const div = document.createElement('div');
+    div.className = 'form-page dataset-page';
+    div.id = `datasetPage_${uid}`;
+    div.setAttribute('data-uid', uid);
+
+    div.innerHTML = `
+      <div class="page-title">Monitoring Dataset ${dsIndex}</div>
+
+      <div class="section">
+        <div class="section-title">Dataset Information</div>
+        <div class="grid-4">
+          <div><label>Dataset #</label><input type="text" name="${uid}_num" value="${dsIndex}"></div>
+          <div><label>Survey Date</label><input type="date" name="${uid}_date"></div>
+          <div><label>Surveyor</label><input type="text" name="${uid}_surveyor"></div>
+          <div><label>Weather / Conditions</label><input type="text" name="${uid}_conditions"></div>
+        </div>
+        <div class="mt-10"><label>Dataset Label / Description</label><input type="text" name="${uid}_label"></div>
+      </div>
+
+      <div class="section csv-import-section">
+        <div class="section-title">Import Dataset CSV</div>
+        <div class="section-subtext">Import this survey's CSV. dN/dE/dH are calculated automatically against the baseline. OCC rows are skipped.</div>
+        <div class="csv-drop-zone" id="dropZone_${uid}">
+          <input type="file" accept=".csv,.txt" id="csvInput_${uid}" class="ds-csv-input" data-uid="${uid}">
+          <div class="drop-icon">📂</div>
+          <div class="drop-label">Drop CSV / TXT file here, or tap to browse</div>
+          <div class="drop-sub">Format: PointID, Northing, Easting, Elevation, Description</div>
+        </div>
+        <div class="import-banner" id="importBanner_${uid}"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Point Observations</div>
+        <div class="section-subtext">Coordinates and differences from baseline. Import a CSV above, or enter data manually.</div>
+        <div class="table-scroll">
+          <table class="mon-table" id="monTable_${uid}">
+            <thead>
+              <tr>
+                <th rowspan="2" style="min-width:60px">PT #</th>
+                <th rowspan="2" style="min-width:120px">TYPE</th>
+                <th colspan="3" class="group-header">OBSERVED COORDINATES</th>
+                <th colspan="3" class="group-header">DIFF FROM BASELINE (mm)</th>
+                <th rowspan="2" style="min-width:120px">REMARKS</th>
+              </tr>
+              <tr>
+                <th>NORTHING</th><th>EASTING</th><th>ELEVATION</th>
+                <th>DN</th><th>DE</th><th>DH</th>
+              </tr>
+            </thead>
+            <tbody id="monBody_${uid}"></tbody>
+          </table>
+        </div>
+        <div class="btn-row btn-row-controls mt-10">
+          <button type="button" class="btn-ghost add-obs-row" data-uid="${uid}">+ Add Row</button>
+          <button type="button" class="btn-danger remove-ds-btn" data-uid="${uid}">🗑 Remove This Dataset</button>
+        </div>
+      </div>
+    `;
+
+    // Wire CSV import for this page
+    const csvInput = div.querySelector(`#csvInput_${uid}`);
+    const dropZone = div.querySelector(`#dropZone_${uid}`);
+    const banner   = div.querySelector(`#importBanner_${uid}`);
+
+    function handleDsCsv(file) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const pts = parseCsv(ev.target.result);
+        if (!pts.length) {
+          banner.className = 'import-banner err';
+          banner.textContent = '! No valid points found. Check format: PointID, Northing, Easting, Elevation, Description';
+          banner.style.display = 'block';
+          return;
+        }
+
+        // Units check
+        const unitWarnings = checkUnits(pts);
+        if (unitWarnings.length) {
+          const proceed = confirm(
+            'Unit warnings detected on import:\n\n' +
+            unitWarnings.join('\n\n') +
+            '\n\nDo you want to import anyway?'
+          );
+          if (!proceed) return;
+        }
+
+        // Repeat import detection - check if this file's survey date
+        // matches any existing dataset date (we infer from filename or warn generically)
+        const currentDate = div.querySelector(`[name="${uid}_date"]`)?.value;
+        if (currentDate) {
+          const usedDates = getUsedDatasetDates();
+          // Remove this page's own date before checking duplicates
+          const otherPages = Array.from(document.querySelectorAll('.dataset-page'))
+            .filter(p => p.getAttribute('data-uid') !== uid);
+          const otherDates = new Set();
+          otherPages.forEach(p => {
+            const puid = p.getAttribute('data-uid');
+            const d = p.querySelector(`[name="${puid}_date"]`)?.value;
+            if (d) otherDates.add(d);
+          });
+          if (otherDates.has(currentDate)) {
+            const proceed = confirm(
+              `! Duplicate date detected!\n\nA dataset with the date "${currentDate}" already exists in this report.\n\nAre you sure you want to import? This may create duplicate data.`
+            );
+            if (!proceed) return;
+          }
+        }
+
+        const tbody = document.getElementById(`monBody_${uid}`);
+        tbody.innerHTML = '';
+        let missing = 0;
+        pts.forEach(p => {
+          const d = calcDiff(p.pt, p.N, p.E, p.H);
+          if (d.dN === null) missing++;
+          tbody.appendChild(buildObsRow(p.pt, p.desc, p.N, p.E, p.H,
+            d.dN !== null ? d.dN : '',
+            d.dE !== null ? d.dE : '',
+            d.dH !== null ? d.dH : '', '', false));
+        });
+        tbody.querySelectorAll('.diff-input').forEach(highlightCell);
+
+        let msg = `OK: ${pts.length} points imported.`;
+        if (missing > 0) msg += ` ${missing} point(s) not in baseline - differences left blank.`;
+        if (unitWarnings.length) msg += ' ! Unit warnings - verify data.';
+        banner.className = (missing > 0 || unitWarnings.length) ? 'import-banner err' : 'import-banner ok';
+        banner.textContent = msg;
+        banner.style.display = 'block';
+        saveNow();
+      };
+      reader.readAsText(file);
+    }
+
+    csvInput.addEventListener('change', e => { if (e.target.files[0]) handleDsCsv(e.target.files[0]); });
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault(); dropZone.classList.remove('drag-over');
+      const f = e.dataTransfer.files[0]; if (f) handleDsCsv(f);
+    });
+
+    // Add row button
+    div.querySelector('.add-obs-row').addEventListener('click', () => {
+      document.getElementById(`monBody_${uid}`).appendChild(buildObsRow('','','','','','','','','', true));
+      saveNow();
+    });
+
+    // Remove dataset button
+    div.querySelector('.remove-ds-btn').addEventListener('click', () => {
+      if (confirm('Remove this entire dataset page?')) { div.remove(); saveNow(); }
+    });
+
+    return div;
+  }
+
+  function addDatasetPage() {
+    datasetCount++;
+    const page = buildDatasetPage(datasetCount);
+    document.getElementById('datasetPagesContainer').appendChild(page);
+    return page;
+  }
+
+  function recalcAllDatasets() {
+    document.querySelectorAll('.ds-obs-row').forEach(row => {
+      const ptId = row.getAttribute('data-pt');
+      if (!ptId) return;
+      const nIn = row.querySelector('.obs-N');
+      const eIn = row.querySelector('.obs-E');
+      const hIn = row.querySelector('.obs-H');
+      if (!nIn||!eIn||!hIn) return;
+      const N = parseFloat(nIn.value), E = parseFloat(eIn.value), H = parseFloat(hIn.value);
+      if (!isNaN(N)&&!isNaN(E)&&!isNaN(H)) setDiffCells(row, calcDiff(ptId, N, E, H));
+    });
+  }
+
+  /* ============================================================
+     THRESHOLD HIGHLIGHTING
+  ============================================================ */
+  function getThresholds() {
+    return {
+      warn:  parseFloat(document.getElementById('thresh_warn').value)  || 20,
+      alert: parseFloat(document.getElementById('thresh_alert').value) || 30,
+    };
+  }
+
+  function highlightCell(input) {
+    const val = parseFloat(input.value);
+    input.classList.remove('val-ok','val-warn','val-alert');
+    if (isNaN(val)) return;
+    const abs = Math.abs(val);
+    const t = getThresholds();
+    if      (abs >= t.alert) input.classList.add('val-alert');
+    else if (abs >= t.warn)  input.classList.add('val-warn');
+    else                     input.classList.add('val-ok');
+  }
+
+  ['thresh_warn','thresh_alert','thresh_limit'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      document.querySelectorAll('.diff-input').forEach(highlightCell);
+    });
+  });
+
+  /* ============================================================
+     ADD DATASET / RESET
+  ============================================================ */
+  document.getElementById('addDatasetPage').addEventListener('click', () => { addDatasetPage(); saveNow(); });
+
+  document.getElementById('resetForm').addEventListener('click', () => {
+    if (confirm('Reset the entire form? All data will be cleared.')) {
+      try { localStorage.removeItem('vgShoringMonitoring'); } catch(e) {}
+      location.reload();
+    }
+  });
+
+  /* ============================================================
+     AUTOSAVE  (field values only - CSVs are re-imported each session)
+  ============================================================ */
+  const saveBadge     = document.getElementById('saveBadge');
+  const saveBadgeText = document.getElementById('saveBadgeText');
+  let saveTimer = null;
+
+  function saveNow() {
+    try {
+      const data = { __datasetCount: datasetCount };
+      // Save baseline table
+      const initRows = [];
+      document.querySelectorAll('#initialTableBody tr').forEach(r => {
+        const ptIn   = r.querySelector('.init-pt-input');
+        const descIn = r.querySelector('.init-desc-input');
+        const NIn    = r.querySelector('.init-N-input');
+        const EIn    = r.querySelector('.init-E-input');
+        const HIn    = r.querySelector('.init-H-input');
+        if (!ptIn) return;
+        initRows.push({ pt: ptIn.value, desc: descIn?descIn.value:'', N: NIn?NIn.value:'', E: EIn?EIn.value:'', H: HIn?HIn.value:'' });
+      });
+      data.__initRows = initRows;
+
+      // Save dataset obs rows
+      const dsData = {};
+      document.querySelectorAll('.dataset-page').forEach(page => {
+        const uid = page.getAttribute('data-uid');
+        const rows = [];
+        page.querySelectorAll('.ds-obs-row').forEach(r => {
+          const pt   = r.getAttribute('data-pt') || '';
+          const descEl = r.querySelector('.obs-desc-input') || r.querySelector('.pt-type');
+          const desc = descEl ? (descEl.textContent || descEl.value || '') : '';
+          const isManual = !!r.querySelector('.obs-pt-new');
+          rows.push({
+            pt, desc, isManual,
+            N:  r.querySelector('.obs-N')?.value  || '',
+            E:  r.querySelector('.obs-E')?.value  || '',
+            H:  r.querySelector('.obs-H')?.value  || '',
+            dN: r.querySelector('.obs-dN')?.value || '',
+            dE: r.querySelector('.obs-dE')?.value || '',
+            dH: r.querySelector('.obs-dH')?.value || '',
+            rem: r.querySelector('.obs-remarks')?.value || ''
+          });
+        });
+        dsData[uid] = rows;
+      });
+      data.__dsRows = dsData;
+
+      // Named inputs
+      document.querySelectorAll('#monitoringForm input[name], #monitoringForm select[name], #monitoringForm textarea[name]').forEach(el => {
+        data[el.name] = el.value;
+      });
+      localStorage.setItem('vgShoringMonitoring', JSON.stringify(data));
+    } catch(e) {}
+  }
+
+  function scheduleAutosave() {
+    if (saveTimer) clearTimeout(saveTimer);
+    saveBadge.style.display = 'flex';
+    saveBadgeText.textContent = 'Saving…';
+    saveTimer = setTimeout(() => {
+      saveNow();
+      saveBadgeText.textContent = 'Saved';
+      setTimeout(() => { saveBadge.style.display = 'none'; }, 1800);
+    }, 800);
+  }
+
+  document.getElementById('monitoringForm').addEventListener('input',  scheduleAutosave);
+  document.getElementById('monitoringForm').addEventListener('change', scheduleAutosave);
+
+  // Rebuild baseline whenever initial table changes
+  document.getElementById('initialTableBody').addEventListener('input',  rebuildBaselineFromTable);
+  document.getElementById('initialTableBody').addEventListener('change', rebuildBaselineFromTable);
+
+  /* ============================================================
+     RESTORE
+  ============================================================ */
+  function restoreForm() {
+    try {
+      const raw = localStorage.getItem('vgShoringMonitoring');
+      if (!raw) return;
+      const data = JSON.parse(raw);
+
+      // Restore init rows
+      if (data.__initRows && data.__initRows.length) {
+        const tbody = document.getElementById('initialTableBody');
+        tbody.innerHTML = '';
+        const pts = [];
+        data.__initRows.forEach(r => {
+          tbody.appendChild(buildInitialRowEditable(r.pt, r.desc, parseFloat(r.N)||undefined, parseFloat(r.E)||undefined, parseFloat(r.H)||undefined));
+          const N=parseFloat(r.N), E=parseFloat(r.E), H=parseFloat(r.H);
+          if (!isNaN(N)&&!isNaN(E)&&!isNaN(H)) pts.push({pt:r.pt, N, E, H, desc:r.desc});
+        });
+        setBaseline(pts);
+      }
+
+      // Rebuild dataset pages
+      const savedCount = parseInt(data.__datasetCount) || 0;
+      for (let i = 0; i < savedCount; i++) addDatasetPage();
+
+      // Restore obs rows per dataset
+      if (data.__dsRows) {
+        Object.keys(data.__dsRows).forEach(uid => {
+          const tbody = document.getElementById(`monBody_${uid}`);
+          if (!tbody) return;
+          tbody.innerHTML = '';
+          data.__dsRows[uid].forEach(r => {
+            const row = buildObsRow(r.pt, r.desc, r.N, r.E, r.H, r.dN, r.dE, r.dH, r.rem, r.isManual||false);
+            tbody.appendChild(row);
+          });
+          tbody.querySelectorAll('.diff-input').forEach(highlightCell);
+        });
+      }
+
+      // Restore named inputs
+      Object.keys(data).forEach(name => {
+        if (name.startsWith('__')) return;
+        const el = document.querySelector(`[name="${name}"]`);
+        if (el) el.value = data[name];
+      });
+
+    } catch(e) { console.warn('Restore error:', e); }
+  }
+
+  /* ============================================================
+     PDF GENERATION
+  ============================================================ */
+  function showProgress(title) {
+    document.getElementById('progressTitle').textContent = title;
+    document.getElementById('progressSub').textContent = 'Starting…';
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('progressCount').textContent = '';
+    document.getElementById('pdfProgress').classList.add('active');
+  }
+  function hideProgress() { document.getElementById('pdfProgress').classList.remove('active'); }
+  function updateProgress(done, total, msg) {
+    document.getElementById('progressFill').style.width = (total>0?Math.round(done/total*100):0)+'%';
+    document.getElementById('progressSub').textContent = msg||'';
+    document.getElementById('progressCount').textContent = total>0?`${done} / ${total}`:'';
+  }
+  function tick() { return new Promise(r => setTimeout(r, 0)); }
+
+  function buildPdfName() {
+    const job     = (document.querySelector("[name='job_no']")?.value     || 'job').trim();
+    const client  = (document.querySelector("[name='client']")?.value      || '').trim();
+    const project = (document.querySelector("[name='project_name']")?.value || '').trim();
+    const date    = document.querySelector("[name='report_date']")?.value   || new Date().toISOString().slice(0,10);
+    const parts   = [job, client, project, date].filter(Boolean);
+    return parts.map(p => p.replace(/[^a-zA-Z0-9_\-. ]/g, '').trim().replace(/\s+/g, '_')).join('-') + '.pdf';
+  }
+
+  /* ============================================================
+     SUMMARY DATA BUILDER
+     Collects max absolute movement per point across all datasets.
+  ============================================================ */
+  function buildSummaryData() {
+    const t = getThresholds();
+    // Collect all dataset pages in order
+    const dspages = Array.from(document.querySelectorAll('.dataset-page'));
+    const datasets = dspages.map(p => {
+      const uid   = p.getAttribute('data-uid');
+      const date  = p.querySelector(`[name="${uid}_date"]`)?.value  || '';
+      const label = p.querySelector(`[name="${uid}_label"]`)?.value || '';
+      const num   = p.querySelector(`[name="${uid}_num"]`)?.value   || '';
+      const rows  = Array.from(p.querySelectorAll('.ds-obs-row')).map(r => ({
+        pt:  r.getAttribute('data-pt') || '',
+        dN:  parseFloat(r.querySelector('.obs-dN')?.value) || 0,
+        dE:  parseFloat(r.querySelector('.obs-dE')?.value) || 0,
+        dH:  parseFloat(r.querySelector('.obs-dH')?.value) || 0,
+      }));
+      return { num, date, label, rows };
+    });
+
+    // Max absolute movement per point
+    const ptMax = {};   // ptId -> { dN, dE, dH, absMax }
+    const ptDesc = {};  // ptId -> desc string
+    // Collect descriptions from initial table
+    document.querySelectorAll('#initialTableBody tr').forEach(r => {
+      const pt   = r.querySelector('.init-pt-input')?.value?.trim();
+      const desc = r.querySelector('.init-desc-input')?.value?.trim() || '';
+      if (pt) ptDesc[pt] = desc;
+    });
+    // Also from CSV-imported rows (static badges)
+    document.querySelectorAll('.ds-obs-row').forEach(r => {
+      const pt = r.getAttribute('data-pt');
+      if (!pt || ptDesc[pt]) return;
+      const badge = r.querySelector('.pt-type');
+      if (badge) ptDesc[pt] = badge.textContent.trim();
+    });
+
+    datasets.forEach(ds => {
+      ds.rows.forEach(row => {
+        const { pt, dN, dE, dH } = row;
+        if (!pt) return;
+        const absMax = Math.max(Math.abs(dN), Math.abs(dE), Math.abs(dH));
+        if (!ptMax[pt] || absMax > ptMax[pt].absMax) {
+          ptMax[pt] = { dN, dE, dH, absMax };
+        }
+      });
+    });
+
+    // Overall status
+    let alertPts = 0, warnPts = 0;
+    Object.values(ptMax).forEach(v => {
+      if (v.absMax >= t.alert) alertPts++;
+      else if (v.absMax >= t.warn) warnPts++;
+    });
+
+    const overallStatus = alertPts > 0 ? 'ALERT'
+      : warnPts > 0 ? 'WARNING'
+      : Object.keys(ptMax).length > 0 ? 'WITHIN TOLERANCE'
+      : 'NO DATA';
+
+    return { datasets, ptMax, ptDesc, alertPts, warnPts, overallStatus, t };
+  }
+
+  /* ============================================================
+     SUMMARY PAGE RENDERER  (native jsPDF - crisp, always fits)
+  ============================================================ */
+  function renderSummaryPage(pdf) {
+    const PW = pdf.internal.pageSize.getWidth();
+    const PH = pdf.internal.pageSize.getHeight();
+    const ML = 36, MR = 36, MT = 0;
+    const cW = PW - ML - MR;
+
+    const C_BLUE_DARK  = [11,  48,  69];
+    const C_BLUE       = [22,  95, 125];
+    const C_BLUE_LIGHT = [42, 127, 163];
+    const C_WHITE      = [255,255,255];
+    const C_LIGHT_BG   = [244,248,253];
+    const C_BORDER     = [198,212,229];
+    const C_GREEN      = [39, 174,  96];
+    const C_YELLOW     = [230,126,  34];
+    const C_RED        = [192, 57,  43];
+    const C_TEXT       = [16,  24,  40];
+    const C_MUTED      = [107,114,128];
+
+    const { datasets, ptMax, ptDesc, alertPts, warnPts, overallStatus, t } = buildSummaryData();
+
+    // ── HEADER BAR ──────────────────────────────────────────────
+    pdf.setFillColor(...C_BLUE_DARK);
+    pdf.rect(0, 0, PW, 54, 'F');
+    pdf.setFillColor(...C_BLUE_LIGHT);
+    pdf.rect(0, 0, 6, 54, 'F');
+
+    pdf.setTextColor(...C_WHITE);
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(18);
+    pdf.text('VISTA', ML, 22);
+    pdf.setFont('helvetica','normal');
+    pdf.text('GEOMATICS', ML + pdf.getTextWidth('VISTA') + 3, 22);
+
+    pdf.setFontSize(9);
+    pdf.setTextColor(200, 220, 235);
+    pdf.text('Monitoring Report', ML, 35);
+
+    // Report date top-right
+    const rptDate = document.querySelector("[name='report_date']")?.value || new Date().toISOString().slice(0,10);
+    pdf.setFontSize(8);
+    pdf.setTextColor(200,220,235);
+    pdf.text(`Report Date: ${rptDate}`, PW - MR, 22, { align:'right' });
+
+    // ── PROJECT INFO BLOCK ───────────────────────────────────────
+    let y = 66;
+    const jobNo   = document.querySelector("[name='job_no']")?.value      || '-';
+    const client  = document.querySelector("[name='client']")?.value      || '-';
+    const projNm  = document.querySelector("[name='project_name']")?.value|| '-';
+    const loc     = document.querySelector("[name='location']")?.value    || '-';
+    const surv    = document.querySelector("[name='land_surveyor']")?.value|| '-';
+    const startDt = document.querySelector("[name='start_date']")?.value  || '-';
+
+    pdf.setFillColor(...C_LIGHT_BG);
+    pdf.roundedRect(ML, y, cW, 52, 3, 3, 'F');
+    pdf.setDrawColor(...C_BORDER);
+    pdf.setLineWidth(0.5);
+    pdf.roundedRect(ML, y, cW, 52, 3, 3, 'S');
+
+    const col1 = ML + 10, col2 = ML + cW/2 + 6;
+    const lh = 10;
+    y += 10;
+
+    function infoLine(label, value, x, yy) {
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(7.5); pdf.setTextColor(...C_MUTED);
+      pdf.text(label.toUpperCase(), x, yy);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(...C_TEXT);
+      pdf.text(value, x, yy + 6);
+    }
+
+    infoLine('Job No.',        jobNo,   col1, y);
+    infoLine('Client',         client,  col2, y);
+    y += lh + 6;
+    infoLine('Project',        projNm,  col1, y);
+    infoLine('Location',       loc,     col2, y);
+    y += lh + 6;
+    infoLine('Land Surveyor',  surv,    col1, y);
+    infoLine('Monitoring From',startDt, col2, y);
+    y += 18;
+
+    // ── STATS ROW ────────────────────────────────────────────────
+    const totalPts = Object.keys(ptMax).length;
+    const totalDs  = datasets.length;
+    const allDates = datasets.map(d=>d.date).filter(Boolean).sort();
+    const dateRange = allDates.length
+      ? (allDates[0] === allDates[allDates.length-1] ? allDates[0] : `${allDates[0]} - ${allDates[allDates.length-1]}`)
+      : '-';
+
+    const stats = [
+      { label:'Monitoring Points', value: String(totalPts) },
+      { label:'Datasets',          value: String(totalDs)  },
+      { label:'Survey Period',     value: dateRange         },
+      { label:'Warning Threshold', value: `${t.warn} mm`   },
+      { label:'Alert Threshold',   value: `${t.alert} mm`  },
+    ];
+
+    const statW = cW / stats.length;
+    stats.forEach((s, i) => {
+      const sx = ML + i * statW;
+      pdf.setFillColor(i % 2 === 0 ? 235 : 244, i % 2 === 0 ? 244 : 248, i % 2 === 0 ? 251 : 253);
+      pdf.rect(sx, y, statW, 24, 'F');
+      pdf.setDrawColor(...C_BORDER);
+      pdf.setLineWidth(0.3);
+      pdf.rect(sx, y, statW, 24, 'S');
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(11); pdf.setTextColor(...C_BLUE_DARK);
+      pdf.text(s.value, sx + statW/2, y + 10, {align:'center'});
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(...C_MUTED);
+      pdf.text(s.label, sx + statW/2, y + 19, {align:'center'});
+    });
+    y += 30;
+
+    // ── OVERALL STATUS BANNER ────────────────────────────────────
+    const statusColor = overallStatus === 'ALERT' ? C_RED
+      : overallStatus === 'WARNING' ? C_YELLOW
+      : overallStatus === 'WITHIN TOLERANCE' ? C_GREEN
+      : C_MUTED;
+
+    pdf.setFillColor(...statusColor);
+    pdf.roundedRect(ML, y, cW, 18, 3, 3, 'F');
+    pdf.setTextColor(...C_WHITE);
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(9);
+    const statusMsg = overallStatus === 'ALERT'
+      ? `!  ALERT - ${alertPts} point(s) exceeded the ${t.alert}mm alert threshold`
+      : overallStatus === 'WARNING'
+      ? `!  WARNING - ${warnPts} point(s) exceeded the ${t.warn}mm warning threshold`
+      : overallStatus === 'WITHIN TOLERANCE'
+      ? `OK:  ALL POINTS WITHIN TOLERANCE across ${totalDs} dataset(s)`
+      : '  No dataset data available yet';
+    pdf.text(statusMsg, PW/2, y + 12, {align:'center'});
+    y += 26;
+
+    // ── MAX MOVEMENT SUMMARY TABLE ───────────────────────────────
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(...C_BLUE_DARK);
+    pdf.text('Maximum Observed Movement Per Point (all datasets)', ML, y + 6);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(...C_MUTED);
+    pdf.text('Showing the largest single movement recorded at each point across all survey datasets.', ML, y + 14);
+    y += 20;
+
+    // Table header
+    const cols = [
+      { label:'PT #',        w: 42  },
+      { label:'TYPE',        w: 100 },
+      { label:'MAX DN (mm)', w: 68  },
+      { label:'MAX DE (mm)', w: 68  },
+      { label:'MAX DH (mm)', w: 68  },
+      { label:'MAX TOTAL',   w: 68  },
+      { label:'STATUS',      w: 70  },
+    ];
+    // Remaining width to last col
+    const usedW = cols.reduce((s,c)=>s+c.w,0);
+    cols[cols.length-1].w += (cW - usedW);
+
+    const rowH = 14;
+    const hdrH = 16;
+
+    // Header bg
+    pdf.setFillColor(...C_BLUE_DARK);
+    pdf.rect(ML, y, cW, hdrH, 'F');
+    let cx = ML;
+    cols.forEach(col => {
+      pdf.setTextColor(...C_WHITE);
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(7);
+      pdf.text(col.label, cx + col.w/2, y + 10.5, {align:'center'});
+      cx += col.w;
+    });
+    y += hdrH;
+
+    // Rows
+    const ptIds = Object.keys(ptMax).sort((a,b)=> isNaN(a)||isNaN(b) ? a.localeCompare(b) : +a - +b);
+
+    ptIds.forEach((pt, ri) => {
+      const v = ptMax[pt];
+      const desc = ptDesc[pt] || '';
+      const absMax = v.absMax;
+      const status = absMax >= t.alert ? 'ALERT'
+        : absMax >= t.warn  ? 'WARNING'
+        : 'OK';
+      const rowColor = status === 'ALERT'   ? [254,226,226]
+        : status === 'WARNING' ? [254,243,199]
+        : ri%2===0             ? C_WHITE
+        : C_LIGHT_BG;
+
+      pdf.setFillColor(...rowColor);
+      pdf.rect(ML, y, cW, rowH, 'F');
+      pdf.setDrawColor(...C_BORDER);
+      pdf.setLineWidth(0.2);
+      pdf.rect(ML, y, cW, rowH, 'S');
+
+      // Left accent stripe for alert/warn
+      if (status === 'ALERT') {
+        pdf.setFillColor(...C_RED);
+        pdf.rect(ML, y, 3, rowH, 'F');
+      } else if (status === 'WARNING') {
+        pdf.setFillColor(...C_YELLOW);
+        pdf.rect(ML, y, 3, rowH, 'F');
+      }
+
+      const cellY = y + rowH/2 + 2.5;
+      const vals  = [pt, desc, v.dN, v.dE, v.dH, absMax.toFixed(0), status];
+
+      cx = ML;
+      vals.forEach((val, ci) => {
+        const col = cols[ci];
+        let tc = C_TEXT;
+        let fw = 'normal';
+        if (ci >= 2 && ci <= 5) {
+          const num = parseFloat(val);
+          if (!isNaN(num)) {
+            const a = Math.abs(num);
+            tc = a >= t.alert ? C_RED : a >= t.warn ? C_YELLOW : C_TEXT;
+            if (a >= t.warn) fw = 'bold';
+          }
+        }
+        if (ci === 6) {
+          tc = status === 'ALERT' ? C_RED : status === 'WARNING' ? C_YELLOW : C_GREEN;
+          fw = 'bold';
+        }
+        pdf.setFont('helvetica', fw);
+        pdf.setFontSize(7.5);
+        pdf.setTextColor(...tc);
+        pdf.text(String(val), cx + col.w/2, cellY, {align:'center'});
+        cx += col.w;
+      });
+      y += rowH;
+
+      // Page break if needed
+      if (y > PH - 50 && ri < ptIds.length - 1) {
+        pdf.addPage();
+        y = MT + 20;
+        // Repeat mini header
+        pdf.setFillColor(...C_BLUE_DARK);
+        pdf.rect(ML, y, cW, hdrH, 'F');
+        cx = ML;
+        cols.forEach(col => {
+          pdf.setTextColor(...C_WHITE);
+          pdf.setFont('helvetica','bold'); pdf.setFontSize(7);
+          pdf.text(col.label, cx + col.w/2, y + 10.5, {align:'center'});
+          cx += col.w;
+        });
+        y += hdrH;
+      }
+    });
+
+    y += 10;
+
+    // ── LEGEND ───────────────────────────────────────────────────
+    if (y < PH - 40) {
+      const legItems = [
+        { color: C_GREEN,  label: `Within tolerance (< ${t.warn}mm)` },
+        { color: C_YELLOW, label: `Warning (>= ${t.warn}mm)` },
+        { color: C_RED,    label: `Alert (>= ${t.alert}mm)` },
+      ];
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); 
+      let lx = ML;
+      legItems.forEach(item => {
+        pdf.setFillColor(...item.color);
+        pdf.circle(lx + 4, y + 3, 3, 'F');
+        pdf.setTextColor(...C_MUTED);
+        pdf.text(item.label, lx + 10, y + 6);
+        lx += pdf.getTextWidth(item.label) + 22;
+      });
+    }
+
+    // ── FOOTER ───────────────────────────────────────────────────
+    pdf.setFillColor(...C_BLUE_DARK);
+    pdf.rect(0, PH - 20, PW, 20, 'F');
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(180,210,225);
+    pdf.text('Vista Geomatics Ltd.  |  Monitoring Report', PW/2, PH - 8, {align:'center'});
+    pdf.text('Page 1', PW - MR, PH - 8, {align:'right'});
+  }
+
+
+  /* ============================================================
+     FORM PAGE RENDERER - native jsPDF
+     Collects all data from the live DOM and renders directly
+     into jsPDF - no html2canvas, no screenshots, crisp output.
+  ============================================================ */
+  function renderFormPagesNative(pdf) {
+    const PW = pdf.internal.pageSize.getWidth();   // 612 pt
+    const PH = pdf.internal.pageSize.getHeight();  // 792 pt
+    const ML = 30, MR = 30, MT = 14;
+    const cW = PW - ML - MR;
+
+    // Colours
+    const CD  = [11,48,69];
+    const CLT = [42,127,163];
+    const CW  = [255,255,255];
+    const CB  = [198,212,229];
+    const CBG = [244,248,253];
+    const CT  = [16,24,40];
+    const CM  = [107,114,128];
+    const CGN = [39,174,96];
+    const CYL = [230,126,34];
+    const CRD = [192,57,43];
+    const CHDR= [231,240,251];
+
+    let pageNum = 2; // summary is page 1
+
+    function addPageHeader(title) {
+      pdf.addPage();
+      // Header bar
+      pdf.setFillColor(...CD);
+      pdf.rect(0, 0, PW, 28, 'F');
+      pdf.setFillColor(...CLT);
+      pdf.rect(0, 0, 5, 28, 'F');
+      // Logo text
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(13); pdf.setTextColor(...CW);
+      pdf.text('VISTA', ML, 18);
+      pdf.setFont('helvetica','normal');
+      pdf.text('GEOMATICS', ML + pdf.getTextWidth('VISTA') + 2, 18);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(180,210,225);
+      pdf.text('Monitoring Report', ML, 25);
+      // Page title bar
+      pdf.setFillColor(236,244,250);
+      pdf.rect(0, 28, PW, 20, 'F');
+      pdf.setDrawColor(...CB); pdf.setLineWidth(0.3);
+      pdf.line(0, 48, PW, 48);
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(11); pdf.setTextColor(...CD);
+      pdf.text(title, PW/2, 42, {align:'center'});
+      return 54; // return starting Y
+    }
+
+    function addPageFooter(num) {
+      pdf.setFillColor(...CD); pdf.rect(0, PH-18, PW, 18, 'F');
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(180,210,225);
+      pdf.text('Vista Geomatics Ltd.  |  Monitoring Report', PW/2, PH-6, {align:'center'});
+      pdf.text('Page '+num, PW-MR, PH-6, {align:'right'});
+    }
+
+    function sectionHeader(y, title) {
+      pdf.setFillColor(22,95,125);
+      pdf.rect(ML, y, 4, 12, 'F');
+      pdf.setFillColor(...CBG);
+      pdf.rect(ML+4, y, cW-4, 12, 'F');
+      pdf.setDrawColor(...CB); pdf.setLineWidth(0.3);
+      pdf.rect(ML, y, cW, 12, 'S');
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(8); pdf.setTextColor(...CD);
+      pdf.text(title, ML+8, y+8.5);
+      return y + 14;
+    }
+
+    function fieldRow(y, fields) {
+      // Filter out empty label+value pairs
+      const visible = fields.filter(f => f.label || f.value);
+      if (!visible.length) return y;
+      const ROW_H = 20; // enough for label (6pt) + gap + value (9pt)
+      const colW  = cW / visible.length;
+      // Background
+      pdf.setFillColor(247,251,255);
+      pdf.roundedRect(ML, y, cW, ROW_H, 1, 1, 'F');
+      pdf.setDrawColor(...CB); pdf.setLineWidth(0.2);
+      pdf.roundedRect(ML, y, cW, ROW_H, 1, 1, 'S');
+      visible.forEach((f, i) => {
+        const x = ML + i * colW + 5;
+        // Column divider
+        if (i > 0) {
+          pdf.setDrawColor(...CB); pdf.setLineWidth(0.2);
+          pdf.line(ML + i * colW, y+1, ML + i * colW, y+ROW_H-1);
+        }
+        // Clip value text to column width
+        const maxW = colW - 10;
+        // Label - small grey caps
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(6); pdf.setTextColor(...CM);
+        pdf.text((f.label||'').toUpperCase(), x, y+7);
+        // Value - Vista blue bold
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(...CD);
+        let val = f.value || '-';
+        while (val.length > 1 && pdf.getTextWidth(val) > maxW) val = val.slice(0,-1);
+        if (val !== (f.value||'-')) val = val.slice(0,-1) + '~';
+        pdf.text(val, x, y+16);
+      });
+      return y + ROW_H + 3;
+    }
+
+    function tableHeader(y, cols) {
+      const rowH = 14;
+      pdf.setFillColor(...CD);
+      pdf.rect(ML, y, cW, rowH, 'F');
+      let cx = ML;
+      cols.forEach(col => {
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(6.5); pdf.setTextColor(...CW);
+        pdf.text(col.label, cx + col.w/2, y + rowH/2 + 2.5, {align:'center'});
+        cx += col.w;
+      });
+      return y + rowH;
+    }
+
+    function tableRow(y, cols, vals, highlights) {
+      const rowH = 11;
+      cols.forEach((col, ci) => {
+        const cx = ML + cols.slice(0,ci).reduce((s,c)=>s+c.w,0);
+        const val = vals[ci] !== undefined ? String(vals[ci]) : '';
+        const hl  = highlights ? highlights[ci] : null;
+
+        // Cell background
+        if (hl === 'alert')   { pdf.setFillColor(254,226,226); pdf.rect(cx,y,col.w,rowH,'F'); }
+        else if (hl === 'warn') { pdf.setFillColor(254,243,199); pdf.rect(cx,y,col.w,rowH,'F'); }
+
+        // Cell border
+        pdf.setDrawColor(...CB); pdf.setLineWidth(0.15);
+        pdf.rect(cx, y, col.w, rowH, 'S');
+
+        // Text
+        const tc  = hl==='alert' ? CRD : hl==='warn' ? CYL : CT;
+        const fw  = hl ? 'bold' : 'normal';
+        pdf.setFont('helvetica', fw); pdf.setFontSize(7); pdf.setTextColor(...tc);
+        // Clip text to column width
+        const maxW = col.w - 4;
+        let txt = val;
+        while (txt.length > 1 && pdf.getTextWidth(txt) > maxW) txt = txt.slice(0,-1);
+        if (txt !== val) txt = txt.slice(0,-1) + '~';
+        pdf.text(txt, cx + col.w/2, y + rowH/2 + 2.5, {align:'center'});
+      });
+      return y + rowH;
+    }
+
+    // ── PAGE DETAILS PAGE ──────────────────────────────────────────
+    let y = addPageHeader('PROJECT DETAILS');
+
+    // Project info
+    y = sectionHeader(y, 'Project Information');
+    y += 4;
+    const jn  = document.querySelector("[name='job_no']")?.value    || '';
+    const cl  = document.querySelector("[name='client']")?.value    || '';
+    const pn  = document.querySelector("[name='project_name']")?.value || '';
+    const loc = document.querySelector("[name='location']")?.value  || '';
+    const sv  = document.querySelector("[name='land_surveyor']")?.value || '';
+    const sd  = document.querySelector("[name='start_date']")?.value || '';
+    const rd  = document.querySelector("[name='report_date']")?.value || '';
+    y = fieldRow(y, [{label:'Job No.',value:jn},{label:'Client',value:cl},{label:'Project Name',value:pn}]);
+    y = fieldRow(y, [{label:'Location / Site Address',value:loc},{label:'Land Surveyor',value:sv},{label:'Monitoring Start Date',value:sd}]);
+    y = fieldRow(y, [{label:'Report Date',value:rd}]);
+    y += 4;
+
+    // Control info
+    y = sectionHeader(y, 'Control / Reference Information');
+    y += 4;
+    const initDate = document.querySelector("[name='initial_dataset_date']")?.value || '';
+    const ctrl     = document.querySelector("[name='control_stations']")?.value     || '';
+    const ctrlNotes= document.querySelector("[name='control_notes']")?.value        || '';
+    y = fieldRow(y, [{label:'Survey Method',value:'Total Station'},{label:'Initial Dataset Date',value:initDate},{label:'Control Station(s)',value:ctrl}]);
+    if (ctrlNotes) {
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(6.5); pdf.setTextColor(...CM);
+      pdf.text('NOTES ON REFERENCE SETUP', ML, y);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(...CT);
+      const noteLines = pdf.splitTextToSize(ctrlNotes, cW);
+      noteLines.slice(0,3).forEach((l,i) => pdf.text(l, ML, y+8+(i*8)));
+      y += 8 + Math.min(noteLines.length,3)*8 + 4;
+    } else { y += 4; }
+
+    // Equipment
+    y = sectionHeader(y, 'Survey Equipment');
+    y += 4;
+    const eqCols = [{label:'TYPE',w:cW*0.25},{label:'MODEL',w:cW*0.3},{label:'SERIAL NO.',w:cW*0.25},{label:'CALIBRATION DATE',w:cW*0.2}];
+    y = tableHeader(y, eqCols);
+    for (let r=1; r<=3; r++) {
+      const ev = [
+        document.querySelector("[name='equip_type_" + r + "']")?.value||'',
+        document.querySelector("[name='equip_model_" + r + "']")?.value||'',
+        document.querySelector("[name='equip_serial_" + r + "']")?.value||'',
+        document.querySelector("[name='equip_cal_" + r + "']")?.value||''
+      ];
+      // Alternating row bg
+      if (r%2===0) { pdf.setFillColor(...CBG); pdf.rect(ML,y,cW,11,'F'); }
+      y = tableRow(y, eqCols, ev);
+    }
+    y += 6;
+
+    // Thresholds
+    y = sectionHeader(y, 'Alert Thresholds');
+    y += 4;
+    const tw = document.querySelector("[name='thresh_warn']")?.value  || '20';
+    const ta = document.querySelector("[name='thresh_alert']")?.value || '30';
+    const tl = document.querySelector("[name='thresh_limit']")?.value || '50';
+    y = fieldRow(y, [{label:'Warning Threshold (mm)',value:tw},{label:'Alert Threshold (mm)',value:ta},{label:'Absolute Limit (mm)',value:tl}]);
+
+    addPageFooter(pageNum++);
+
+    // ── INITIAL DATASET PAGE ───────────────────────────────────────
+    y = addPageHeader('INITIAL DATASET (BASELINE)');
+
+    // Baseline survey info
+    y = sectionHeader(y, 'Baseline Survey Information');
+    y += 4;
+    const bd = document.querySelector("[name='initial_date']")?.value        || '';
+    const bs = document.querySelector("[name='initial_surveyor']")?.value    || '';
+    const bc = document.querySelector("[name='initial_conditions']")?.value  || '';
+    const bn = document.querySelector("[name='initial_notes']")?.value       || '';
+    y = fieldRow(y, [{label:'Survey Date',value:bd},{label:'Surveyor',value:bs},{label:'Weather / Conditions',value:bc}]);
+    if (bn) {
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(6.5); pdf.setTextColor(...CM);
+      pdf.text('NOTES', ML, y);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(...CT);
+      const noteLines = pdf.splitTextToSize(bn, cW);
+      noteLines.slice(0,2).forEach((l,i) => pdf.text(l, ML, y+8+(i*8)));
+      y += 8 + Math.min(noteLines.length,2)*8 + 4;
+    } else { y += 2; }
+
+    // Baseline coordinates table
+    y = sectionHeader(y, 'Baseline Point Coordinates');
+    y += 2;
+    const initCols = [
+      {label:'PT #',    w:cW*0.08},
+      {label:'TYPE',    w:cW*0.16},
+      {label:'NORTHING',w:cW*0.22},
+      {label:'EASTING', w:cW*0.22},
+      {label:'ELEV.',   w:cW*0.16},
+      {label:'NOTES',   w:cW*0.16},
+    ];
+    y = tableHeader(y, initCols);
+
+    const initRows = document.querySelectorAll('#initialTableBody tr');
+    initRows.forEach((r, ri) => {
+      if (y > PH - 30) { addPageFooter(pageNum++); y = addPageHeader('INITIAL DATASET (BASELINE) cont.'); y = tableHeader(y, initCols); }
+      const pt   = r.querySelector('.init-pt-input')?.value   || '';
+      const desc = r.querySelector('.init-desc-input')?.value || '';
+      const N    = r.querySelector('.init-N-input')?.value    || '';
+      const E    = r.querySelector('.init-E-input')?.value    || '';
+      const H    = r.querySelector('.init-H-input')?.value    || '';
+      const note = r.querySelector('input[name^="init_notes"]')?.value || '';
+      if (ri%2===0) { pdf.setFillColor(...CBG); pdf.rect(ML,y,cW,11,'F'); }
+      y = tableRow(y, initCols, [pt, desc, N, E, H, note]);
+    });
+    addPageFooter(pageNum++);
+
+    // ── MONITORING DATASET PAGES ───────────────────────────────────
+    const t = getThresholds();
+    const dspages = Array.from(document.querySelectorAll('.dataset-page'));
+
+    dspages.forEach(page => {
+      const uid   = page.getAttribute('data-uid');
+      const num   = page.querySelector("[name='" + uid + "_num']")?.value         || '';
+      const date  = page.querySelector("[name='" + uid + "_date']")?.value        || '';
+      const surv  = page.querySelector("[name='" + uid + "_surveyor']")?.value    || '';
+      const cond  = page.querySelector("[name='" + uid + "_conditions']")?.value  || '';
+      const label = page.querySelector("[name='" + uid + "_label']")?.value       || '';
+
+      y = addPageHeader('MONITORING DATASET ' + num + (label ? '  -  ' + label : ''));
+
+      // Dataset info
+      y = sectionHeader(y, 'Dataset Information');
+      y += 4;
+      y = fieldRow(y, [{label:'Dataset #',value:num},{label:'Survey Date',value:date},{label:'Surveyor',value:surv},{label:'Weather / Conditions',value:cond}]);
+      y += 2;
+
+      // Observations table
+      y = sectionHeader(y, 'Point Observations');
+      y += 2;
+
+      // Two header rows: group + individual
+      const obsCols = [
+        {label:'PT #',    w:cW*0.06},
+        {label:'TYPE',    w:cW*0.13},
+        {label:'NORTHING',w:cW*0.14},
+        {label:'EASTING', w:cW*0.13},
+        {label:'ELEV.',   w:cW*0.10},
+        {label:'DN',      w:cW*0.08},
+        {label:'DE',      w:cW*0.08},
+        {label:'DH',      w:cW*0.08},
+        {label:'REMARKS', w:cW*0.20},
+      ];
+
+      // Group header
+      const gh1start = ML + obsCols.slice(0,2).reduce((s,c)=>s+c.w,0);
+      const gh1w     = obsCols.slice(2,5).reduce((s,c)=>s+c.w,0);
+      const gh2start = ML + obsCols.slice(0,5).reduce((s,c)=>s+c.w,0);
+      const gh2w     = obsCols.slice(5,8).reduce((s,c)=>s+c.w,0);
+
+      pdf.setFillColor(42,127,163); pdf.rect(gh1start,y,gh1w,8,'F');
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(5.5); pdf.setTextColor(...CW);
+      pdf.text('OBSERVED COORDINATES', gh1start+gh1w/2, y+5.5, {align:'center'});
+
+      pdf.setFillColor(11,48,69); pdf.rect(gh2start,y,gh2w,8,'F');
+      pdf.text('DIFF FROM BASELINE (mm)', gh2start+gh2w/2, y+5.5, {align:'center'});
+      y += 8;
+
+      y = tableHeader(y, obsCols);
+
+      const obsRows = page.querySelectorAll('.ds-obs-row');
+      obsRows.forEach((r, ri) => {
+        if (y > PH - 30) {
+          addPageFooter(pageNum++);
+          y = addPageHeader('MONITORING DATASET ' + num + ' (cont.)');
+          // Repeat group + column headers
+          pdf.setFillColor(42,127,163); pdf.rect(gh1start,y,gh1w,8,'F');
+          pdf.setFont('helvetica','bold'); pdf.setFontSize(5.5); pdf.setTextColor(...CW);
+          pdf.text('OBSERVED COORDINATES', gh1start+gh1w/2, y+5.5, {align:'center'});
+          pdf.setFillColor(11,48,69); pdf.rect(gh2start,y,gh2w,8,'F');
+          pdf.text('DIFF FROM BASELINE (mm)', gh2start+gh2w/2, y+5.5, {align:'center'});
+          y += 8;
+          y = tableHeader(y, obsCols);
+        }
+
+        const pt    = r.getAttribute('data-pt') || r.querySelector('.obs-pt-new')?.value || '';
+        const badge = r.querySelector('.pt-type');
+        const descI = r.querySelector('.obs-desc-input');
+        const desc  = badge ? badge.textContent.trim() : (descI ? descI.value : '');
+        const N     = r.querySelector('.obs-N')?.value  || '';
+        const E     = r.querySelector('.obs-E')?.value  || '';
+        const H     = r.querySelector('.obs-H')?.value  || '';
+        const dN    = r.querySelector('.obs-dN')?.value || '';
+        const dE    = r.querySelector('.obs-dE')?.value || '';
+        const dH    = r.querySelector('.obs-dH')?.value || '';
+        const rem   = r.querySelector('.obs-remarks')?.value || '';
+
+        // Determine highlights per diff column
+        function hlClass(v) {
+          const n = parseFloat(v);
+          if (isNaN(n)) return null;
+          const a = Math.abs(n);
+          return a >= t.alert ? 'alert' : a >= t.warn ? 'warn' : null;
+        }
+        const hl = [null, null, null, null, null, hlClass(dN), hlClass(dE), hlClass(dH), null];
+
+        if (ri%2===0) { pdf.setFillColor(...CBG); pdf.rect(ML,y,cW,11,'F'); }
+        y = tableRow(y, obsCols, [pt, desc, N, E, H, dN, dE, dH, rem], hl);
+      });
+
+      addPageFooter(pageNum++);
+    });
+  }
+
+
+  async function generatePdf() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:'portrait', unit:'pt', format:'letter' });
+
+    updateProgress(0, 5, 'Building monitoring summary…');
+    await tick();
+    renderSummaryPage(pdf);
+
+    updateProgress(1, 5, 'Rendering movement heat map…');
+    await tick();
+    renderHeatMap(pdf);
+
+    updateProgress(2, 5, 'Rendering peak movement chart…');
+    await tick();
+
+
+    updateProgress(3, 5, 'Building flagged points report…');
+    await tick();
+    renderFlaggedPoints(pdf);
+
+    updateProgress(4, 5, 'Rendering dataset pages…');
+    await tick();
+    renderFormPagesNative(pdf);
+
+    updateProgress(4, 4, 'Done');
+    return pdf;
+  }
+
+  async function handlePdf(action) {
+    const totalPages = 4 + document.querySelectorAll('.form-page').length;
+    showProgress(action==='share' ? 'Preparing PDF to Share' : 'Generating PDF');
+    updateProgress(0, totalPages, 'Building summary page…');
+    try {
+      saveNow();
+      const pdf  = await generatePdf();
+      const name = buildPdfName();
+      if (action==='download') { pdf.save(name); hideProgress(); return; }
+      const blob = new Blob([pdf.output('arraybuffer')], {type:'application/pdf'});
+      const file = new File([blob], name, {type:'application/pdf'});
+      if (navigator.canShare&&navigator.canShare({files:[file]})) {
+        await navigator.share({files:[file], title:'Monitoring Report'});
+      } else if (navigator.share) {
+        const url = URL.createObjectURL(blob);
+        try { await navigator.share({title:'Monitoring Report', url}); } finally { URL.revokeObjectURL(url); }
+      } else { pdf.save(name); }
+    } catch(err) { console.error('PDF ERROR:', err); alert('PDF error: ' + err.message + '\n\nCheck browser console (F12) for details.'); }
+    finally { hideProgress(); }
+  }
+
+  document.getElementById('downloadPdf').addEventListener('click', () => handlePdf('download'));
+  document.getElementById('shareBtn').addEventListener('click',    () => handlePdf('share'));
+
+  /* ============================================================
+     INIT
+  ============================================================ */
+  restoreForm();
+  // If nothing was restored, start with one blank dataset page
+  if (datasetCount === 0) addDatasetPage();
+
+
+/* ============================================================
+     TIME SERIES DATA BUILDER
+  ============================================================ */
+  function buildTimeSeriesData() {
+    const series = {};
+    Array.from(document.querySelectorAll('.dataset-page')).forEach(page => {
+      const uid   = page.getAttribute('data-uid');
+      const date  = page.querySelector("[name='" + uid + "_date']")?.value  || '';
+      const num   = page.querySelector("[name='" + uid + "_num']")?.value   || '';
+      const label = page.querySelector("[name='" + uid + "_label']")?.value || ('DS ' + num);
+      page.querySelectorAll('.ds-obs-row').forEach(r => {
+        const pt = r.getAttribute('data-pt'); if (!pt) return;
+        const dN = parseFloat(r.querySelector('.obs-dN')?.value);
+        const dE = parseFloat(r.querySelector('.obs-dE')?.value);
+        const dH = parseFloat(r.querySelector('.obs-dH')?.value);
+        if (isNaN(dN) && isNaN(dE) && isNaN(dH)) return;
+        if (!series[pt]) series[pt] = [];
+        series[pt].push({ date, label, dN:isNaN(dN)?0:dN, dE:isNaN(dE)?0:dE, dH:isNaN(dH)?0:dH });
+      });
+    });
+    return series;
+  }
+
+  /* ============================================================
+     HEAT MAP PAGE
+  ============================================================ */
+  function renderHeatMap(pdf) {
+    const PW = pdf.internal.pageSize.getWidth();
+    const PH = pdf.internal.pageSize.getHeight();
+    const ML = 30, MR = 30;
+    const t   = getThresholds();
+    const series = buildTimeSeriesData();
+    const { ptDesc } = buildSummaryData();
+    const dspages = Array.from(document.querySelectorAll('.dataset-page'));
+    if (!dspages.length) return;
+    const ptIds = Object.keys(series).sort((a,b) => isNaN(a)||isNaN(b) ? a.localeCompare(b) : +a-+b);
+    if (!ptIds.length) return;
+    const datasets = dspages.map(p => {
+      const uid  = p.getAttribute('data-uid');
+      const date = p.querySelector("[name='" + uid + "_date']")?.value || '';
+      const label= p.querySelector("[name='" + uid + "_label']")?.value || '';
+      return { uid, date, label };
+    });
+    const CD=[11,48,69], CW=[255,255,255], CB=[198,212,229], CM=[107,114,128];
+    const cW = PW - ML - MR;
+
+    pdf.addPage();
+    pdf.setFillColor(...CD); pdf.rect(0,0,PW,22,'F');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(...CW);
+    pdf.text('Movement Heat Map  -  Peak Movement per Point per Dataset', ML, 14);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(180,210,225);
+    pdf.text(document.querySelector("[name='report_date']")?.value||'', PW-MR, 14, {align:'right'});
+
+    let y = 30;
+    const labelColW = 130;
+    const dsColW = Math.min(52, (cW - labelColW) / datasets.length);
+    const rowH = 14, hdrH = 28;
+
+    pdf.setFillColor(...CD); pdf.rect(ML, y, labelColW, hdrH, 'F');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(7); pdf.setTextColor(...CW);
+    pdf.text('POINT', ML + labelColW/2, y + 10, {align:'center'});
+    pdf.text('TYPE',  ML + labelColW/2, y + 19, {align:'center'});
+
+    datasets.forEach((ds, di) => {
+      const cx = ML + labelColW + di * dsColW;
+      pdf.setFillColor(...CD); pdf.rect(cx, y, dsColW, hdrH, 'F');
+      pdf.setDrawColor(255,255,255); pdf.setLineWidth(0.3); pdf.rect(cx, y, dsColW, hdrH, 'S');
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(5.5); pdf.setTextColor(...CW);
+      const dateLbl = ds.date ? ds.date.slice(5) : ('DS'+(di+1));
+      pdf.text(dateLbl, cx + dsColW/2, y + 10, {align:'center'});
+      if (ds.label) { const sl = ds.label.length>8?ds.label.slice(0,7)+'~':ds.label; pdf.text(sl, cx + dsColW/2, y + 19, {align:'center'}); }
+    });
+    y += hdrH;
+
+    const movMap = {};
+    ptIds.forEach(pt => {
+      movMap[pt] = {};
+      (series[pt]||[]).forEach((entry, di) => { movMap[pt][di] = Math.max(Math.abs(entry.dN), Math.abs(entry.dE), Math.abs(entry.dH)); });
+    });
+
+    ptIds.forEach((pt, ri) => {
+      if (y + rowH > PH - 30) {
+        pdf.setFillColor(...CD); pdf.rect(0,PH-20,PW,20,'F');
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(180,210,225);
+        pdf.text('Vista Geomatics Ltd.  |  Monitoring Report',PW/2,PH-8,{align:'center'});
+        pdf.addPage();
+        pdf.setFillColor(...CD); pdf.rect(0,0,PW,22,'F');
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(...CW);
+        pdf.text('Movement Heat Map  (continued)', ML, 14);
+        y = 30;
+      }
+      const rowBg = ri%2===0 ? [255,255,255] : [245,249,254];
+      pdf.setFillColor(...rowBg); pdf.rect(ML, y, labelColW + dsColW*datasets.length, rowH, 'F');
+      pdf.setDrawColor(...CB); pdf.setLineWidth(0.2); pdf.rect(ML, y, labelColW + dsColW*datasets.length, rowH, 'S');
+      const desc = ptDesc[pt] || '';
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(7.5); pdf.setTextColor(...CD);
+      pdf.text(pt, ML + 5, y + rowH/2 + 2.5);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(6.5); pdf.setTextColor(...CM);
+      if (desc) { const sd=desc.length>10?desc.slice(0,9)+'~':desc; pdf.text(sd, ML+28, y+rowH/2+2.5); }
+
+      datasets.forEach((ds, di) => {
+        const cx = ML + labelColW + di * dsColW;
+        const val = movMap[pt][di];
+        pdf.setDrawColor(...CB); pdf.setLineWidth(0.2); pdf.rect(cx, y, dsColW, rowH, 'S');
+        if (val === undefined) {
+          pdf.setFillColor(230,230,230); pdf.rect(cx, y, dsColW, rowH, 'F');
+          pdf.setFont('helvetica','normal'); pdf.setFontSize(6); pdf.setTextColor(160,160,160);
+          pdf.text('-', cx+dsColW/2, y+rowH/2+2, {align:'center'}); return;
+        }
+        let fillColor, textColor;
+        if (val >= t.alert) { const intensity=Math.min(1,(val-t.alert)/t.alert); fillColor=[Math.min(255,Math.round(192+63*intensity)),Math.round(57*(1-intensity*0.5)),Math.round(43*(1-intensity*0.5))]; textColor=[255,255,255]; }
+        else if (val >= t.warn) { const intensity=(val-t.warn)/(t.alert-t.warn); fillColor=[Math.round(230+15*intensity),Math.round(126+30*(1-intensity)),Math.round(34*(1-intensity*0.5))]; textColor=[255,255,255]; }
+        else if (val > 0) { const intensity=val/t.warn; fillColor=[Math.round(209+46*(1-intensity)),Math.round(250-76*intensity),Math.round(209-113*intensity)]; textColor=[6,78,59]; }
+        else { fillColor=[220,245,230]; textColor=[6,78,59]; }
+        pdf.setFillColor(...fillColor); pdf.rect(cx, y, dsColW, rowH, 'F');
+        pdf.setDrawColor(...CB); pdf.setLineWidth(0.2); pdf.rect(cx, y, dsColW, rowH, 'S');
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(6.5); pdf.setTextColor(...textColor);
+        pdf.text(val.toFixed(0), cx+dsColW/2, y+rowH/2+2.5, {align:'center'});
+      });
+      y += rowH;
+    });
+
+    y += 8;
+    if (y < PH - 40) {
+      const steps=[0,Math.round(t.warn*0.5),t.warn,Math.round((t.warn+t.alert)/2),t.alert,t.alert*1.5];
+      const stepColors=[[220,245,230],[180,240,200],[254,243,199],[254,200,100],[254,150,100],[192,57,43]];
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(7); pdf.setTextColor(...CD);
+      pdf.text('Colour Scale (mm):', ML, y+5);
+      steps.forEach((v,si)=>{ const bx=ML+90+si*38; pdf.setFillColor(...stepColors[si]); pdf.rect(bx,y,34,10,'F'); pdf.setDrawColor(...CB); pdf.setLineWidth(0.2); pdf.rect(bx,y,34,10,'S'); pdf.setFont('helvetica','normal'); pdf.setFontSize(6); pdf.setTextColor(...CM); pdf.text(v+'mm',bx+17,y+16,{align:'center'}); });
+    }
+    pdf.setFillColor(...CD); pdf.rect(0,PH-20,PW,20,'F');
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(180,210,225);
+    pdf.text('Vista Geomatics Ltd.  |  Monitoring Report',PW/2,PH-8,{align:'center'});
+  }
+
+  /* ============================================================
+     BAR CHART PAGE
+  ============================================================ */
+  function renderBarChart(pdf) {
+    const PW = pdf.internal.pageSize.getWidth();
+    const PH = pdf.internal.pageSize.getHeight();
+    const ML = 30, MR = 30;
+    const t   = getThresholds();
+    const { ptMax, ptDesc } = buildSummaryData();
+    const ptIds = Object.keys(ptMax).sort((a,b) => ptMax[b].absMax - ptMax[a].absMax);
+    if (!ptIds.length) return;
+    const CD=[11,48,69], CW=[255,255,255], CB=[198,212,229], CM=[107,114,128];
+    const cW = PW - ML - MR;
+
+    pdf.addPage();
+    pdf.setFillColor(...CD); pdf.rect(0,0,PW,22,'F');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(...CW);
+    pdf.text('Peak Movement Summary  -  All Points Ranked', ML, 14);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(180,210,225);
+    pdf.text(document.querySelector("[name='report_date']")?.value||'', PW-MR, 14, {align:'right'});
+
+    let y = 30;
+    const labelW=95, valW=32;
+    const barAreaW = cW - labelW - valW - 8;
+    const barH=11, rowGap=3;
+    const maxVal = Math.max(...ptIds.map(pt=>ptMax[pt].absMax), t.alert*1.2);
+    function valToX(v) { return ML + labelW + 4 + (v/maxVal)*barAreaW; }
+
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(...CM);
+    pdf.text('Peak movement (mm) across all datasets', ML+labelW+barAreaW/2, y+6, {align:'center'});
+    y += 12;
+
+    // Threshold lines
+    [[t.warn,'WARN',[230,126,34]],[t.alert,'ALERT',[192,57,43]]].forEach(([val,label,color])=>{
+      const lx=valToX(val);
+      if(lx>ML+labelW&&lx<ML+labelW+barAreaW+4){
+        pdf.setDrawColor(...color); pdf.setLineWidth(0.6); pdf.setLineDashPattern([3,2],0);
+        pdf.line(lx,y,lx,y+ptIds.length*(barH+rowGap)+4);
+        pdf.setLineDashPattern([],0);
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(6); pdf.setTextColor(...color);
+        pdf.text(label,lx,y-2,{align:'center'});
+      }
+    });
+
+    ptIds.forEach((pt, ri) => {
+      if (ri*(barH+rowGap)+y > PH-40) return;
+      const v=ptMax[pt].absMax, desc=ptDesc[pt]||'';
+      const ry=y+ri*(barH+rowGap);
+      if(ri%2===0){pdf.setFillColor(248,251,255);pdf.rect(ML,ry,cW,barH,'F');}
+      // Label
+      if(desc){pdf.setFont('helvetica','normal');pdf.setFontSize(6.5);pdf.setTextColor(...CM);const sd=desc.length>11?desc.slice(0,10)+'~':desc;pdf.text(sd,ML+2,ry+barH/2+2.5);}
+      pdf.setFont('helvetica','bold');pdf.setFontSize(7.5);pdf.setTextColor(...CD);
+      pdf.text(pt,ML+labelW-2,ry+barH/2+2.5,{align:'right'});
+      // Bar
+      const barColor=v>=t.alert?[192,57,43]:v>=t.warn?[230,126,34]:[39,174,96];
+      pdf.setFillColor(235,241,248);pdf.roundedRect(ML+labelW+4,ry+1,barAreaW,barH-2,1,1,'F');
+      const barW=Math.max(2,(v/maxVal)*barAreaW);
+      pdf.setFillColor(...barColor);pdf.roundedRect(ML+labelW+4,ry+1,barW,barH-2,1,1,'F');
+      pdf.setFont('helvetica','bold');pdf.setFontSize(7);pdf.setTextColor(...barColor);
+      pdf.text(v.toFixed(0)+'mm',ML+labelW+4+barAreaW+4,ry+barH/2+2.5);
+    });
+
+    y += ptIds.length*(barH+rowGap)+10;
+    const tickCount=6;
+    for(let i=0;i<=tickCount;i++){const tv=(maxVal/tickCount)*i,tx=valToX(tv);pdf.setDrawColor(...CB);pdf.setLineWidth(0.2);pdf.line(tx,y-4,tx,y);pdf.setFont('helvetica','normal');pdf.setFontSize(6);pdf.setTextColor(...CM);pdf.text(Math.round(tv)+'',tx,y+5,{align:'center'});}
+    y+=14;
+    const legItems=[{color:[39,174,96],label:'Within tolerance (< '+t.warn+'mm)'},{color:[230,126,34],label:'Warning (>= '+t.warn+'mm)'},{color:[192,57,43],label:'Alert (>= '+t.alert+'mm)'}];
+    let lx=ML;
+    legItems.forEach(item=>{pdf.setFillColor(...item.color);pdf.roundedRect(lx,y,10,7,1,1,'F');pdf.setFont('helvetica','normal');pdf.setFontSize(7);pdf.setTextColor(...CM);pdf.text(item.label,lx+13,y+5.5);lx+=pdf.getTextWidth(item.label)+22;});
+    pdf.setFillColor(...CD);pdf.rect(0,PH-20,PW,20,'F');
+    pdf.setFont('helvetica','normal');pdf.setFontSize(7);pdf.setTextColor(180,210,225);
+    pdf.text('Vista Geomatics Ltd.  |  Monitoring Report',PW/2,PH-8,{align:'center'});
+  }
+
+  /* ============================================================
+     FLAGGED POINTS REPORT
+  ============================================================ */
+  function renderFlaggedPoints(pdf) {
+    const { ptMax, ptDesc, t } = buildSummaryData();
+    const series = buildTimeSeriesData();
+    const flagged = Object.keys(ptMax).filter(pt=>ptMax[pt].absMax>=t.warn).sort((a,b)=>ptMax[b].absMax-ptMax[a].absMax);
+    if (!flagged.length) return;
+    const PW=pdf.internal.pageSize.getWidth(), PH=pdf.internal.pageSize.getHeight();
+    const ML=30, MR=30, cW=PW-ML-MR;
+    const CD=[11,48,69],CL=[244,248,253],CB=[198,212,229],CT=[16,24,40],CM=[107,114,128];
+    const CW2=[255,255,255],CG=[39,174,96],CY=[230,126,34],CR=[192,57,43];
+
+    function pageHeader(cont) {
+      pdf.addPage();
+      pdf.setFillColor(...CD); pdf.rect(0,0,PW,22,'F');
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(...CW2);
+      pdf.text(cont?'Flagged Points Report  (continued)':('Flagged Points Report  -  '+flagged.length+' point(s) exceeded threshold'),ML,14);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(180,210,225);
+      pdf.text(document.querySelector("[name='report_date']")?.value||'',PW-MR,14,{align:'right'});
+      return 32;
+    }
+    function pageFooter() {
+      pdf.setFillColor(...CD); pdf.rect(0,PH-20,PW,20,'F');
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(180,210,225);
+      pdf.text('Vista Geomatics Ltd.  |  Monitoring Report',PW/2,PH-8,{align:'center'});
+    }
+
+    let y=pageHeader(false), firstPage=true;
+    flagged.forEach((pt,pi)=>{
+      const max=ptMax[pt],desc=ptDesc[pt]||'',history=series[pt]||[];
+      const status=max.absMax>=t.alert?'ALERT':'WARNING', SC=status==='ALERT'?CR:CY;
+      const blockH=26+history.length*11+14;
+      if(!firstPage&&y+blockH>PH-30){pageFooter();y=pageHeader(true);}
+      firstPage=false;
+      pdf.setFillColor(...SC); pdf.rect(ML,y,4,22,'F');
+      pdf.setFillColor(...CL); pdf.rect(ML+4,y,cW-4,22,'F');
+      pdf.setDrawColor(...CB); pdf.setLineWidth(0.4); pdf.rect(ML,y,cW,22,'S');
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(...CD);
+      pdf.text('Point '+pt+(desc?' - '+desc:''),ML+10,y+9);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(...CM);
+      pdf.text('Max dN: '+max.dN+'mm   Max dE: '+max.dE+'mm   Max dH: '+max.dH+'mm   Peak: '+max.absMax.toFixed(0)+'mm',ML+10,y+18);
+      pdf.setFillColor(...SC); pdf.roundedRect(PW-MR-52,y+4,48,14,2,2,'F');
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(8); pdf.setTextColor(...CW2);
+      pdf.text(status,PW-MR-28,y+14,{align:'center'});
+      y+=26;
+      const cols=[{l:'DATE',w:70},{l:'LABEL',w:90},{l:'dN (mm)',w:65},{l:'dE (mm)',w:65},{l:'dH (mm)',w:65},{l:'PEAK',w:52},{l:'STATUS',w:56}];
+      const used=cols.reduce((s,c)=>s+c.w,0); cols[1].w+=(cW-used);
+      pdf.setFillColor(230,238,248); pdf.rect(ML,y,cW,10,'F');
+      let cx=ML;
+      cols.forEach(c=>{pdf.setFont('helvetica','bold');pdf.setFontSize(6.5);pdf.setTextColor(...CD);pdf.text(c.l,cx+c.w/2,y+7,{align:'center'});cx+=c.w;});
+      y+=10;
+      history.forEach((row,ri)=>{
+        const rm=Math.max(Math.abs(row.dN),Math.abs(row.dE),Math.abs(row.dH));
+        const rs=rm>=t.alert?'ALERT':rm>=t.warn?'WARN':'OK';
+        const rbg=rs==='ALERT'?[254,226,226]:rs==='WARN'?[254,243,199]:ri%2===0?CW2:CL;
+        pdf.setFillColor(...rbg); pdf.rect(ML,y,cW,11,'F');
+        pdf.setDrawColor(...CB); pdf.setLineWidth(0.15); pdf.rect(ML,y,cW,11,'S');
+        const vals=[row.date||'-',row.label||'-',row.dN,row.dE,row.dH,rm.toFixed(0),rs];
+        cx=ML;
+        vals.forEach((v,vi)=>{
+          const c=cols[vi];let tc=CT,fw='normal';
+          if(vi>=2&&vi<=5){const n=parseFloat(v);if(!isNaN(n)){const a=Math.abs(n);tc=a>=t.alert?CR:a>=t.warn?CY:CT;if(a>=t.warn)fw='bold';}}
+          if(vi===6){tc=rs==='ALERT'?CR:rs==='WARN'?CY:CG;fw='bold';}
+          pdf.setFont('helvetica',fw);pdf.setFontSize(7);pdf.setTextColor(...tc);
+          pdf.text(String(v),cx+c.w/2,y+7.5,{align:'center'});cx+=c.w;
+        });
+        y+=11;
+      });
+      y+=10;
+    });
+    pageFooter();
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    updateProgress(0, 4, 'Building monitoring summary...');
+
+
+
+    updateProgress(1, 4, 'Rendering movement heat map...');
+
+
+
+
+
+
+
+    updateProgress(2, 4, 'Building flagged points report...');
+
+
+
+    updateProgress(3, 4, 'Rendering dataset pages...');
+
+
+
+    updateProgress(4, 4, 'Done');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        document.querySelector("[name='equip_type_" + r + "']")?.value||'',
+        document.querySelector("[name='equip_model_" + r + "']")?.value||'',
+        document.querySelector("[name='equip_serial_" + r + "']")?.value||'',
+        document.querySelector("[name='equip_cal_" + r + "']")?.value||''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      const num   = page.querySelector("[name='" + uid + "_num']")?.value         || '';
+      const date  = page.querySelector("[name='" + uid + "_date']")?.value        || '';
+      const surv  = page.querySelector("[name='" + uid + "_surveyor']")?.value    || '';
+      const cond  = page.querySelector("[name='" + uid + "_conditions']")?.value  || '';
+      const label = page.querySelector("[name='" + uid + "_label']")?.value       || '';
+
+})();
+</script>
+</body>
+</html>
