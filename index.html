@@ -1312,39 +1312,52 @@
 
     // ── PROJECT INFO BLOCK ───────────────────────────────────────
     let y = 66;
-    const jobNo   = document.querySelector("[name='job_no']")?.value      || '-';
-    const client  = document.querySelector("[name='client']")?.value      || '-';
-    const projNm  = document.querySelector("[name='project_name']")?.value|| '-';
-    const loc     = document.querySelector("[name='location']")?.value    || '-';
-    const surv    = document.querySelector("[name='land_surveyor']")?.value|| '-';
-    const startDt = document.querySelector("[name='start_date']")?.value  || '-';
+    const jobNo   = document.querySelector("[name='job_no']")?.value       || '-';
+    const client  = document.querySelector("[name='client']")?.value       || '-';
+    const projNm  = document.querySelector("[name='project_name']")?.value || '-';
+    const loc     = document.querySelector("[name='location']")?.value     || '-';
+    const surv    = document.querySelector("[name='land_surveyor']")?.value || '-';
+    const startDt = document.querySelector("[name='start_date']")?.value   || '-';
+
+    const INFO_ROW_H = 22;  // height per row — label(7) + gap(4) + value(9) + padding
+    const INFO_ROWS  = 3;
+    const INFO_H     = INFO_ROW_H * INFO_ROWS + 10;
 
     pdf.setFillColor(...C_LIGHT_BG);
-    pdf.roundedRect(ML, y, cW, 52, 3, 3, 'F');
+    pdf.roundedRect(ML, y, cW, INFO_H, 3, 3, 'F');
     pdf.setDrawColor(...C_BORDER);
     pdf.setLineWidth(0.5);
-    pdf.roundedRect(ML, y, cW, 52, 3, 3, 'S');
+    pdf.roundedRect(ML, y, cW, INFO_H, 3, 3, 'S');
 
-    const col1 = ML + 10, col2 = ML + cW/2 + 6;
-    const lh = 10;
-    y += 10;
+    // Vertical centre divider
+    pdf.setDrawColor(...C_BORDER); pdf.setLineWidth(0.3);
+    pdf.line(ML + cW/2, y+4, ML + cW/2, y + INFO_H - 4);
+
+    const col1 = ML + 10, col2 = ML + cW/2 + 10;
+    const colMaxW = cW/2 - 20;
+    y += 8;
 
     function infoLine(label, value, x, yy) {
-      pdf.setFont('helvetica','bold'); pdf.setFontSize(7.5); pdf.setTextColor(...C_MUTED);
+      // Label — small bold grey caps
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(6.5); pdf.setTextColor(...C_MUTED);
       pdf.text(label.toUpperCase(), x, yy);
-      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(...C_TEXT);
-      pdf.text(value, x, yy + 6);
+      // Value — Vista blue bold, clipped to column width
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(9.5); pdf.setTextColor(...C_BLUE_DARK);
+      let val = value || '-';
+      while (val.length > 1 && pdf.getTextWidth(val) > colMaxW) val = val.slice(0,-1);
+      if (val !== (value||'-')) val = val.slice(0,-1) + '~';
+      pdf.text(val, x, yy + 10);
     }
 
-    infoLine('Job No.',        jobNo,   col1, y);
-    infoLine('Client',         client,  col2, y);
-    y += lh + 6;
-    infoLine('Project',        projNm,  col1, y);
-    infoLine('Location',       loc,     col2, y);
-    y += lh + 6;
-    infoLine('Land Surveyor',  surv,    col1, y);
-    infoLine('Monitoring From',startDt, col2, y);
-    y += 18;
+    infoLine('Job No.',         jobNo,   col1, y);
+    infoLine('Client',          client,  col2, y);
+    y += INFO_ROW_H;
+    infoLine('Project',         projNm,  col1, y);
+    infoLine('Location',        loc,     col2, y);
+    y += INFO_ROW_H;
+    infoLine('Land Surveyor',   surv,    col1, y);
+    infoLine('Monitoring From', startDt, col2, y);
+    y += INFO_ROW_H + 6;
 
     // ── STATS ROW ────────────────────────────────────────────────
     const totalPts = Object.keys(ptMax).length;
